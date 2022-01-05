@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "me.ninni.macaws.mixin",
+
+  "mixins": [
+    "TrackedDataHandlerRegistryAccessor"
+  ],
+  "client": [
+    "client.EntityModelLayersInvoker",
+    "client.EntityModelLayersMixin",
+  ],
+
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

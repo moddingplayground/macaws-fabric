@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+
+  "id": "macaws",
+  "version": "${version}",
+  "license": "MIT",
+
+  "name": "Macaws",
+  "icon": "assets/macaws/icon.png",
+  "description": "",
+
+  "authors": [
+    "Ninni",
+    "andante"
+  ],
+
+  "contact": {
+    "sources": "https://github.com/N1nn1/macaws",
+    "issues": "https://github.com/N1nn1/macaws/issues"
+  },
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.ninni.macaws.Macaws"
+    ],
+    "client": [
+      "me.ninni.macaws.client.MacawsClient"
+    ]
+  },
+  "mixins": [
+    "macaws.mixins.json"
+  ],
+  "accessWidener": "macaws.accesswidener",
+
+  "depends": {
+    "java": ">=17",
+    "minecraft": ">=1.18",
+    "fabricloader": ">=0.12.12",
+    "fabric": "*"
+  },
+
+  "custom": {
+    "modmenu": {
+      "badges": [],
+      "links": {
+        "mod.macaws.contact.discord": "https://discord.gg/fT4MKzUTZS"
+      }
+    }
+  }
+}

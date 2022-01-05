@@ -1,0 +1,27 @@
+package me.ninni.macaws.client.render.entity;
+
+import me.ninni.macaws.client.model.MacawEntityModelLayers;
+import me.ninni.macaws.client.model.entity.MacawEntityModel;
+import me.ninni.macaws.entity.macaw.MacawEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.MobEntityRenderer;
+import net.minecraft.util.Identifier;
+
+import static me.ninni.macaws.client.util.ClientUtil.*;
+
+@Environment(EnvType.CLIENT)
+public class MacawEntityRenderer<T extends MacawEntity> extends MobEntityRenderer<T, MacawEntityModel<T>> {
+    private static final Identifier TEXTURE_EYEPATCH = entityTexture("macaw/macaw_eyepatch");
+
+    public MacawEntityRenderer(EntityRendererFactory.Context ctx) {
+        super(ctx, new MacawEntityModel<>(ctx.getPart(MacawEntityModelLayers.MACAW)), 0.3f);
+        this.addFeature(new MacawEyepatchFeatureRenderer<>(this, new MacawEntityModel<>(ctx.getPart(MacawEntityModelLayers.MACAW_EYEPATCH)), TEXTURE_EYEPATCH));
+    }
+
+    @Override
+    public Identifier getTexture(T entity) {
+        return entity.getVariant().getTexture();
+    }
+}
