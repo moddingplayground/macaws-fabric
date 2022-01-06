@@ -4,6 +4,9 @@ import com.google.common.collect.Sets;
 import me.ninni.macaws.entity.AbstractTameableHeadEntity;
 import me.ninni.macaws.entity.MacawsEntities;
 import me.ninni.macaws.entity.data.MacawsTrackedDataHandlerRegistry;
+import me.ninni.macaws.entity.data.TrackedDataPackager;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
@@ -40,12 +43,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -57,13 +63,19 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 
+import static me.ninni.macaws.client.util.ClientUtil.*;
 import static me.ninni.macaws.util.MacawsNbtConstants.*;
 
 public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer {
-    private static final TrackedData<MacawVariant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
+    private static final TrackedData<Variant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
     private static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Personality> PERSONALITY = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_PERSONALITY);
+
+    public static final float PITCH_DEVIANCE = 0.125f;
 
     private static final Set<Item> TAMING_INGREDIENTS = Sets.newHashSet(Items.MELON_SLICE, Items.GLISTERING_MELON_SLICE, Items.APPLE);
     private static final Item EYEPATCH_GIVE_ITEM = Items.BLACK_WOOL;
@@ -85,7 +97,9 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData data, @Nullable NbtCompound nbt) {
-        this.setVariant(MacawVariant.random(this.random));
+        this.setVariant(Variant.random(this.random));
+        this.setPersonality(Personality.random(this.random));
+
         if (data == null) data = new PassiveEntity.PassiveData(false);
         return super.initialize(world, difficulty, spawnReason, data, nbt);
     }
@@ -112,11 +126,11 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     }
 
     // getters/setters
-    public MacawVariant getVariant() {
+    public Variant getVariant() {
         return this.dataTracker.get(VARIANT);
     }
 
-    public void setVariant(MacawVariant variant) {
+    public void setVariant(Variant variant) {
         this.dataTracker.set(VARIANT, variant);
     }
 
@@ -126,6 +140,14 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
     public void setHasEyepatch(boolean eyepatch) {
         this.dataTracker.set(HAS_EYEPATCH, eyepatch);
+    }
+
+    public Personality getPersonality() {
+        return this.dataTracker.get(PERSONALITY);
+    }
+
+    public void setPersonality(Personality personality) {
+        this.dataTracker.set(PERSONALITY, personality);
     }
 
     // tick
@@ -232,7 +254,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
     @Override
     public float getSoundPitch() {
-        return (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f;
+        return this.getPersonality().pitch() + (this.random.nextFloat(PITCH_DEVIANCE * 2) - PITCH_DEVIANCE);
     }
 
     @Override
@@ -300,8 +322,9 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(VARIANT, MacawVariant.SCARLET);
+        this.dataTracker.startTracking(VARIANT, Variant.SCARLET);
         this.dataTracker.startTracking(HAS_EYEPATCH, false);
+        this.dataTracker.startTracking(PERSONALITY, Personality.EMPTY);
     }
 
     @Override
@@ -309,13 +332,15 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         super.writeCustomDataToNbt(nbt);
         this.getVariant().writeToNbt(nbt);
         nbt.putBoolean(NBT_HAS_EYEPATCH, this.hasEyepatch());
+        this.getPersonality().writeToNbt(nbt);
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.setVariant(MacawVariant.readFromNbt(nbt));
+        this.setVariant(Variant.readFromNbt(nbt));
         this.setHasEyepatch(nbt.getBoolean(NBT_HAS_EYEPATCH));
+        this.setPersonality(Personality.readFromNbt(nbt));
     }
 
     public static class WanderGoal extends FlyGoal {
@@ -354,6 +379,91 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             }
 
             return Optional.empty();
+        }
+    }
+
+    public enum Variant {
+        BLUE_AND_GOLD, SCARLET, HYACINTH, GREEN;
+
+        @Environment(EnvType.CLIENT)
+        private static final Function<String, Identifier> ID_TO_TEXTURE = Util.memoize(id -> entityTexture("macaw/macaw_%s".formatted(id)));
+
+        private static final Variant[] VALUES = Variant.values();
+        public static final Variant DEFAULT = VALUES[0];
+
+        private final String id;
+
+        Variant() {
+            this.id = this.name().toLowerCase();
+        }
+
+        public String getId() {
+            return this.id;
+        }
+
+        public Identifier getTexture() {
+            return ID_TO_TEXTURE.apply(this.getId());
+        }
+
+        public void writeToNbt(NbtCompound nbt) {
+            nbt.putString(NBT_MACAW_VARIANT, this.name());
+        }
+
+        public static Variant readFromNbt(NbtCompound nbt) {
+            return Variant.safeValueOf(nbt.getString(NBT_MACAW_VARIANT));
+        }
+
+        public static Variant random(Random random) {
+            return VALUES[random.nextInt(VALUES.length)];
+        }
+
+        public static Variant safeValueOf(String name) {
+            try { return Variant.valueOf(name); } catch (IllegalArgumentException ignored) {}
+            return DEFAULT;
+        }
+    }
+
+    public record Personality(float pitch) implements TrackedDataPackager<Personality> {
+        public static final Personality EMPTY = new Personality(1.0f);
+
+        public static final float MIN_PITCH = 0.5F;
+        public static final float MAX_PITCH = 1.5F;
+        public static final int DECIMAL_ACCURACY = 100;
+
+        public void writeToNbt(NbtCompound nbt) {
+            NbtCompound personalityNbt = new NbtCompound();
+            personalityNbt.putFloat(NBT_PERSONALITY_PITCH, this.pitch());
+            nbt.put(NBT_PERSONALITY, personalityNbt);
+        }
+
+        public static Personality readFromNbt(NbtCompound nbt) {
+            NbtCompound personalityNbt = nbt.getCompound(NBT_PERSONALITY);
+            if (personalityNbt != null) {
+                float pitch = personalityNbt.getFloat(NBT_PERSONALITY_PITCH);
+                return new Personality(pitch);
+            }
+            return Personality.EMPTY;
+        }
+
+        @Override
+        public void toPacket(PacketByteBuf buf) {
+            buf.writeFloat(this.pitch());
+        }
+
+        @Override
+        public Personality fromPacket(PacketByteBuf buf) {
+            return new Personality(buf.readFloat());
+        }
+
+        @Override
+        public Personality copyForPackager() {
+            return this;
+        }
+
+        public static Personality random(Random random) {
+            float pitch = (random.nextFloat(MAX_PITCH - MIN_PITCH) + MIN_PITCH);
+            float pitchRnd = ((float) (int) (pitch * DECIMAL_ACCURACY)) / DECIMAL_ACCURACY;
+            return new Personality(pitchRnd);
         }
     }
 }
