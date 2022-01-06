@@ -1,7 +1,7 @@
 package me.ninni.macaws.client.model.entity;
 
 import com.google.common.collect.ImmutableList;
-import me.ninni.macaws.entity.macaw.MacawEntity;
+import me.ninni.macaws.entity.MacawEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.model.Dilation;

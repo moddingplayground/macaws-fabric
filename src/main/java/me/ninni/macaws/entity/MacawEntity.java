@@ -1,8 +1,6 @@
-package me.ninni.macaws.entity.macaw;
+package me.ninni.macaws.entity;
 
-import com.google.common.collect.Sets;
-import me.ninni.macaws.entity.AbstractTameableHeadEntity;
-import me.ninni.macaws.entity.MacawsEntities;
+import com.google.common.collect.ImmutableSet;
 import me.ninni.macaws.entity.data.MacawsTrackedDataHandlerRegistry;
 import me.ninni.macaws.entity.data.TrackedDataPackager;
 import net.fabricmc.api.EnvType;
@@ -67,21 +65,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.function.Function;
 
 import static me.ninni.macaws.client.util.ClientUtil.*;
 import static me.ninni.macaws.util.MacawsNbtConstants.*;
+import static net.minecraft.nbt.NbtElement.*;
 
 public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer {
-    private static final TrackedData<Variant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
-    private static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Personality> PERSONALITY = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_PERSONALITY);
-    private static final TrackedData<Integer> RING_COLOR = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Variant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
+    public static final TrackedData<Personality> PERSONALITY = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_PERSONALITY);
+    public static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public static final TrackedData<Integer> RING_COLOR = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
-    public static final float PITCH_DEVIANCE = 0.125f;
-
-    private static final Set<Item> TAMING_INGREDIENTS = Sets.newHashSet(
+    public static final ImmutableSet<Item> TAMING_INGREDIENTS = ImmutableSet.of(
         Items.MELON_SLICE,
         Items.APPLE,
         Items.POTATO,
@@ -90,8 +86,11 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         Items.MELON_SEEDS,
         Items.PUMPKIN_SEEDS,
         Items.WHEAT_SEEDS,
-        Items.BEETROOT_SEEDS);
-    private static final Item EYEPATCH_GIVE_ITEM = Items.BLACK_WOOL;
+        Items.BEETROOT_SEEDS
+    );
+
+    public static final float PITCH_DEVIANCE = 0.125f;
+    public static final Item EYEPATCH_GIVE_ITEM = Items.BLACK_WOOL;
 
     public float flapProgress;
     public float maxWingDeviation;
@@ -112,7 +111,6 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, @Nullable EntityData data, @Nullable NbtCompound nbt) {
         this.setVariant(Variant.random(this.random));
         this.setPersonality(Personality.random(this.random));
-
         if (data == null) data = new PassiveEntity.PassiveData(false);
         return super.initialize(world, difficulty, spawnReason, data, nbt);
     }
@@ -139,19 +137,20 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     }
 
     // getters/setters
-    public DyeColor getRingColor () {
-        return DyeColor.byId(this.dataTracker.get(RING_COLOR));
-    }
-
-    public void setRingColor (DyeColor color){
-        this.dataTracker.set(RING_COLOR, color.getId());
-    }
     public Variant getVariant() {
         return this.dataTracker.get(VARIANT);
     }
 
     public void setVariant(Variant variant) {
         this.dataTracker.set(VARIANT, variant);
+    }
+
+    public Personality getPersonality() {
+        return this.dataTracker.get(PERSONALITY);
+    }
+
+    public void setPersonality(Personality personality) {
+        this.dataTracker.set(PERSONALITY, personality);
     }
 
     public boolean hasEyepatch() {
@@ -162,23 +161,12 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         this.dataTracker.set(HAS_EYEPATCH, eyepatch);
     }
 
-    public Personality getPersonality() {
-        return this.dataTracker.get(PERSONALITY);
+    public DyeColor getRingColor() {
+        return DyeColor.byId(this.dataTracker.get(RING_COLOR));
     }
 
-    public void setPersonality(Personality personality) {
-        this.dataTracker.set(PERSONALITY, personality);
-    }
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void setTamed(boolean tamed) {
-        super.setTamed(tamed);
-        if (tamed) {
-            this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(16.0);
-            this.setHealth(this.getMaxHealth());
-        } else {
-            this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(8.0);
-        }
+    public void setRingColor(DyeColor color){
+        this.dataTracker.set(RING_COLOR, color.getId());
     }
 
     // tick
@@ -218,17 +206,14 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             }
 
             if (this.isTamed()) {
-
                 if (TAMING_INGREDIENTS.contains(stack.getItem()) && this.getHealth() < this.getMaxHealth()) {
                     if (!this.isSilent()) {
-                        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F); // TODO
                         this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
                     }
-                    if (!player.getAbilities().creativeMode) {
-                        stack.decrement(1);
-                    }
 
-                    this.heal(4);
+                    if (!player.getAbilities().creativeMode) stack.decrement(1);
+                    this.heal(4.0f);
                     return ActionResult.SUCCESS;
                 }
 
@@ -312,6 +297,18 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     }
 
     // misc
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void setTamed(boolean tamed) {
+        super.setTamed(tamed);
+        if (tamed) {
+            this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(16.0D);
+            this.setHealth(this.getMaxHealth());
+        } else {
+            this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(8.0D);
+        }
+    }
+
     @Override
     protected boolean hasWings() {
         return this.speed > this.minFlapSpeed;
@@ -403,20 +400,18 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         this.getVariant().writeToNbt(nbt);
-        nbt.putBoolean(NBT_HAS_EYEPATCH, this.hasEyepatch());
         this.getPersonality().writeToNbt(nbt);
-        nbt.putByte("RingColor", (byte) this.getRingColor().getId());
+        nbt.putBoolean(NBT_HAS_EYEPATCH, this.hasEyepatch());
+        nbt.putByte(NBT_RING_COLOR, (byte) this.getRingColor().getId());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setVariant(Variant.readFromNbt(nbt));
-        this.setHasEyepatch(nbt.getBoolean(NBT_HAS_EYEPATCH));
         this.setPersonality(Personality.readFromNbt(nbt));
-        if (nbt.contains("BandanaColor", 99)) {
-            this.setRingColor(DyeColor.byId(nbt.getInt("RingColor")));
-        }
+        this.setHasEyepatch(nbt.getBoolean(NBT_HAS_EYEPATCH));
+        if (nbt.contains(NBT_RING_COLOR, NUMBER_TYPE)) this.setRingColor(DyeColor.byId(nbt.getInt(NBT_RING_COLOR)));
     }
 
     public static class WanderGoal extends FlyGoal {

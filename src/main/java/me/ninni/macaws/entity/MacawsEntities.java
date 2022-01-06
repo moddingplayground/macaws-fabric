@@ -1,7 +1,6 @@
 package me.ninni.macaws.entity;
 
 import me.ninni.macaws.Macaws;
-import me.ninni.macaws.entity.macaw.MacawEntity;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
@@ -24,9 +23,9 @@ public class MacawsEntities {
                                .dimensions(EntityDimensions.fixed(0.5F, 0.9F))
                                .defaultAttributes(
                                    () -> MobEntity.createMobAttributes()
-                                                  .add(EntityAttributes.GENERIC_MAX_HEALTH, 8.0)
-                                                  .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.4f)
-                                                  .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2f)
+                                                  .add(EntityAttributes.GENERIC_MAX_HEALTH, 8.0D)
+                                                  .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.4D)
+                                                  .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2D)
                                )
                                .trackRangeChunks(8),
         colors(0x2864C7, 0xFBCA0C)

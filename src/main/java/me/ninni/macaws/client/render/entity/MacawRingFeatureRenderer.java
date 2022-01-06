@@ -1,31 +1,45 @@
 package me.ninni.macaws.client.render.entity;
 
 import me.ninni.macaws.client.model.entity.MacawEntityModel;
-import me.ninni.macaws.entity.macaw.MacawEntity;
+import me.ninni.macaws.entity.MacawEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-import static me.ninni.macaws.client.util.ClientUtil.*;
-
 @Environment(EnvType.CLIENT)
 public class MacawRingFeatureRenderer<T extends MacawEntity, M extends MacawEntityModel<T>> extends FeatureRenderer<T, M> {
-    private static final Identifier RING = entityTexture("macaw/macaw_ring");
+    private final M model;
+    private final Identifier texture;
 
-    @SuppressWarnings("unchecked")
-    public MacawRingFeatureRenderer(MacawEntityRenderer<T> featureRendererContext) {
-        super((FeatureRendererContext<T, M>) featureRendererContext);
+    public MacawRingFeatureRenderer(FeatureRendererContext<T, M> context, M model, Identifier texture) {
+        super(context);
+        this.model = model;
+        this.texture = texture;
     }
 
     @Override
-    public void render(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, T macaw, float f, float g, float h, float j, float k, float l) {
-        if (macaw.isTamed() && !macaw.isInvisible()) {
-            float[] fs = macaw.getRingColor().getColorComponents();
-            renderModel(this.getContextModel(), RING, matrixStack, vertexConsumerProvider, i, macaw, fs[0], fs[1], fs[2]);
-        }
+    public void render(MatrixStack matrices, VertexConsumerProvider vertices, int light, T entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+        if (!entity.isTamed()) return;
+
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (entity.isInvisibleTo(client.player)) return;
+
+        boolean invisible = entity.isInvisible();
+        RenderLayer layer = invisible ? RenderLayer.getEntityTranslucent(this.texture) : RenderLayer.getEntityCutoutNoCull(this.texture);
+        float[] col = entity.getRingColor().getColorComponents();
+
+        this.getContextModel().copyStateTo(this.model);
+        this.model.animateModel(entity, limbAngle, limbDistance, tickDelta);
+        this.model.setAngles(entity, limbAngle, limbDistance, animationProgress, headYaw, headPitch);
+        VertexConsumer vertex = vertices.getBuffer(layer);
+        this.model.render(matrices, vertex, light, OverlayTexture.DEFAULT_UV, col[0], col[1], col[2], invisible ? 0.15f : 1.0f);
     }
 }

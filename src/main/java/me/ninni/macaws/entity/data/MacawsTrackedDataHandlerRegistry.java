@@ -5,7 +5,7 @@ import net.minecraft.entity.data.TrackedDataHandler;
 
 import java.util.ArrayList;
 
-import static me.ninni.macaws.entity.macaw.MacawEntity.*;
+import static me.ninni.macaws.entity.MacawEntity.*;
 
 public class MacawsTrackedDataHandlerRegistry {
     private static final ArrayList<TrackedDataHandler<?>> HANDLERS = new ArrayList<>();
