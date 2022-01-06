@@ -3,6 +3,7 @@ package me.ninni.macaws.entity;
 import com.google.common.collect.ImmutableSet;
 import me.ninni.macaws.entity.data.MacawsTrackedDataHandlerRegistry;
 import me.ninni.macaws.entity.data.TrackedDataPackager;
+import me.ninni.macaws.sound.MacawsSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
@@ -46,7 +47,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.DyeColor;
@@ -189,7 +190,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
                         }
                     }
 
-                    this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.PLAYERS, 1.0f, 1.0f); // TODO
+                    this.world.playSoundFromEntity(null, this, MacawsSoundEvents.ENTITY_MACAW_SHEAR, SoundCategory.PLAYERS, 1.0f, 1.0f);
                     this.emitGameEvent(GameEvent.SHEAR, player);
 
                     this.setHasEyepatch(false);
@@ -198,7 +199,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             } else {
                 if (stack.isOf(EYEPATCH_GIVE_ITEM)) {
                     this.setHasEyepatch(true);
-                    this.world.playSoundFromEntity(null, this, SoundEvents.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 1.0f, 1.0f); // TODO
+                    this.world.playSoundFromEntity(null, this, MacawsSoundEvents.ENTITY_MACAW_EQUIP_EYEPATCH, SoundCategory.PLAYERS, 1.0f, 1.0f);
                     this.emitGameEvent(GameEvent.MOB_INTERACT, player);
                     stack.decrement(1);
                     return ActionResult.SUCCESS;
@@ -208,7 +209,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             if (this.isTamed()) {
                 if (TAMING_INGREDIENTS.contains(stack.getItem()) && this.getHealth() < this.getMaxHealth()) {
                     if (!this.isSilent()) {
-                        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F); // TODO
+                        this.world.playSoundFromEntity(null, this, MacawsSoundEvents.ENTITY_MACAW_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
                         this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
                     }
 
@@ -251,7 +252,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             if (!player.getAbilities().creativeMode) stack.decrement(1);
 
             if (!this.isSilent()) {
-                this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0f, 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f); // TODO
+                this.world.playSound(null, this.getX(), this.getY(), this.getZ(), MacawsSoundEvents.ENTITY_MACAW_EAT, this.getSoundCategory(), 1.0f, 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f);
             }
 
             if (!this.world.isClient) {
@@ -316,7 +317,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
     @Override
     protected void addFlapEffects() {
-        this.playSound(SoundEvents.ENTITY_PARROT_FLY, 0.15f, 1.0f); // TODO
+        this.playSound(MacawsSoundEvents.ENTITY_MACAW_FLY, 0.15f, 1.0f);
         this.minFlapSpeed = this.speed + this.maxWingDeviation / 2.0f;
     }
 
@@ -328,6 +329,21 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     @Override
     public SoundCategory getSoundCategory() {
         return SoundCategory.NEUTRAL;
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return this.isTamed() ? MacawsSoundEvents.ENTITY_MACAW_AMBIENT_TAMED : MacawsSoundEvents.ENTITY_MACAW_AMBIENT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return this.isTamed() ? MacawsSoundEvents.ENTITY_MACAW_DEATH_TAMED : MacawsSoundEvents.ENTITY_MACAW_DEATH;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return this.isTamed() ? MacawsSoundEvents.ENTITY_MACAW_HURT_TAMED : MacawsSoundEvents.ENTITY_MACAW_HURT;
     }
 
     @Override

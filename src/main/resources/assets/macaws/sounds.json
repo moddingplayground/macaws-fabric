@@ -1,0 +1,88 @@
+{
+  "entity.macaw.ambient": {
+    "sounds": [
+      "macaws:entity/macaw/ambient1",
+      "macaws:entity/macaw/ambient2",
+      "macaws:entity/macaw/ambient3",
+      "macaws:entity/macaw/ambient4"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.ambient"
+  },
+  "entity.macaw.death": {
+    "sounds": [
+      "macaws:entity/macaw/death1",
+      "macaws:entity/macaw/death2"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.death"
+  },
+  "entity.macaw.hurt": {
+    "sounds": [
+      "macaws:entity/macaw/hurt1",
+      "macaws:entity/macaw/hurt2",
+      "macaws:entity/macaw/hurt3"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.hurt"
+  },
+
+  "entity.macaw.ambient_tamed": {
+    "sounds": [
+      "macaws:entity/macaw/tamed/ambient1",
+      "macaws:entity/macaw/tamed/ambient2",
+      "macaws:entity/macaw/tamed/ambient3",
+      "macaws:entity/macaw/tamed/ambient4"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.ambient_tamed"
+  },
+  "entity.macaw.death_tamed": {
+    "sounds": [
+      "macaws:entity/macaw/tamed/death1",
+      "macaws:entity/macaw/tamed/death2"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.death_tamed"
+  },
+  "entity.macaw.hurt_tamed": {
+    "sounds": [
+      "macaws:entity/macaw/tamed/hurt1",
+      "macaws:entity/macaw/tamed/hurt2",
+      "macaws:entity/macaw/tamed/hurt3"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.hurt_tamed"
+  },
+
+  "entity.macaw.eat": {
+    "sounds": [
+      "minecraft:mob/parrot/eat1",
+      "minecraft:mob/parrot/eat2",
+      "minecraft:mob/parrot/eat3"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.eat"
+  },
+  "entity.macaw.fly": {
+    "sounds": [
+      "minecraft:mob/parrot/fly1",
+      "minecraft:mob/parrot/fly2",
+      "minecraft:mob/parrot/fly3",
+      "minecraft:mob/parrot/fly4",
+      "minecraft:mob/parrot/fly5",
+      "minecraft:mob/parrot/fly6",
+      "minecraft:mob/parrot/fly7",
+      "minecraft:mob/parrot/fly8"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.fly"
+  },
+  "entity.macaw.shear": {
+    "sounds": [
+      "minecraft:mob/sheep/shear"
+    ],
+    "subtitle": "subtitles.item.shears.shear"
+  },
+  "entity.macaw.equip_eyepatch": {
+    "sounds": [
+      "minecraft:dig/cloth1",
+      "minecraft:dig/cloth2",
+      "minecraft:dig/cloth3",
+      "minecraft:dig/cloth4"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.equip_eyepatch"
+  }
+}
