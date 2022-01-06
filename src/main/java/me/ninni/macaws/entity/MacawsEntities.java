@@ -24,7 +24,7 @@ public class MacawsEntities {
                                .dimensions(EntityDimensions.fixed(0.5F, 0.9F))
                                .defaultAttributes(
                                    () -> MobEntity.createMobAttributes()
-                                                  .add(EntityAttributes.GENERIC_MAX_HEALTH, 6.0)
+                                                  .add(EntityAttributes.GENERIC_MAX_HEALTH, 8.0)
                                                   .add(EntityAttributes.GENERIC_FLYING_SPEED, 0.4f)
                                                   .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.2f)
                                )

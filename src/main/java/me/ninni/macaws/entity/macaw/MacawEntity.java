@@ -31,6 +31,7 @@ import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.ai.pathing.BirdNavigation;
 import net.minecraft.entity.ai.pathing.EntityNavigation;
 import net.minecraft.entity.ai.pathing.PathNodeType;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -80,7 +81,16 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
     public static final float PITCH_DEVIANCE = 0.125f;
 
-    private static final Set<Item> TAMING_INGREDIENTS = Sets.newHashSet(Items.MELON_SLICE, Items.GLISTERING_MELON_SLICE, Items.APPLE);
+    private static final Set<Item> TAMING_INGREDIENTS = Sets.newHashSet(
+        Items.MELON_SLICE,
+        Items.APPLE,
+        Items.POTATO,
+        Items.BEETROOT,
+        Items.CARROT,
+        Items.MELON_SEEDS,
+        Items.PUMPKIN_SEEDS,
+        Items.WHEAT_SEEDS,
+        Items.BEETROOT_SEEDS);
     private static final Item EYEPATCH_GIVE_ITEM = Items.BLACK_WOOL;
 
     public float flapProgress;
@@ -159,6 +169,17 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     public void setPersonality(Personality personality) {
         this.dataTracker.set(PERSONALITY, personality);
     }
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public void setTamed(boolean tamed) {
+        super.setTamed(tamed);
+        if (tamed) {
+            this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(16.0);
+            this.setHealth(this.getMaxHealth());
+        } else {
+            this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(8.0);
+        }
+    }
 
     // tick
     @Override
@@ -198,6 +219,19 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
             if (this.isTamed()) {
 
+                if (TAMING_INGREDIENTS.contains(stack.getItem()) && this.getHealth() < this.getMaxHealth()) {
+                    if (!this.isSilent()) {
+                        this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.2F);
+                        this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
+                    }
+                    if (!player.getAbilities().creativeMode) {
+                        stack.decrement(1);
+                    }
+
+                    this.heal(4);
+                    return ActionResult.SUCCESS;
+                }
+
                 if (!(item instanceof DyeItem)) {
                     ActionResult actionResult = super.interactMob(player, hand);
                     if ((!actionResult.isAccepted() || this.isBaby()) && this.isOwner(player)) {
@@ -236,7 +270,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             }
 
             if (!this.world.isClient) {
-                if (this.random.nextInt(10) == 0) {
+                if (this.random.nextInt(5) == 0) {
                     this.setOwner(player);
                     this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
                 } else {
