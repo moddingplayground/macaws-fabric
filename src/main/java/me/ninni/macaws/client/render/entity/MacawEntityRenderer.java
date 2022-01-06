@@ -8,9 +8,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
 
 import static me.ninni.macaws.client.util.ClientUtil.*;
 

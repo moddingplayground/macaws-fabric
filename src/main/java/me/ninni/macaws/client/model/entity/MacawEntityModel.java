@@ -4,7 +4,13 @@ import com.google.common.collect.ImmutableList;
 import me.ninni.macaws.entity.macaw.MacawEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.model.*;
+import net.minecraft.client.model.Dilation;
+import net.minecraft.client.model.ModelData;
+import net.minecraft.client.model.ModelPart;
+import net.minecraft.client.model.ModelPartBuilder;
+import net.minecraft.client.model.ModelPartData;
+import net.minecraft.client.model.ModelTransform;
+import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.entity.model.AnimalModel;
 import net.minecraft.util.math.MathHelper;
 
@@ -15,28 +21,28 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
 
     private final ModelPart body;
     private final ModelPart tail;
-    private final ModelPart left_wing;
-    private final ModelPart right_wing;
+    private final ModelPart leftWing;
+    private final ModelPart rightWing;
     private final ModelPart head;
     private final ModelPart jaw;
     private final ModelPart beak;
-    private final ModelPart right_leg;
-    private final ModelPart left_leg;
+    private final ModelPart leftLeg;
+    private final ModelPart rightLeg;
 
     public MacawEntityModel(ModelPart root) {
         this.root = root;
 
         this.body = this.root.getChild("body");
         this.tail = this.body.getChild("tail");
-        this.left_wing = this.body.getChild("left_wing");
-        this.right_wing = this.body.getChild("right_wing");
+        this.leftWing = this.body.getChild("left_wing");
+        this.rightWing = this.body.getChild("right_wing");
 
         this.head = this.root.getChild("head");
         this.jaw = this.head.getChild("jaw");
         this.beak = this.head.getChild("beak");
 
-        this.left_leg = this.root.getChild("left_leg");
-        this.right_leg = this.root.getChild("right_leg");
+        this.leftLeg = this.root.getChild("left_leg");
+        this.rightLeg = this.root.getChild("right_leg");
     }
 
     public static TexturedModelData getTexturedModelData() {
@@ -118,15 +124,6 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
             ModelTransform.of(0.0F, -2.25F, -3.0F, 0.0F, 0.0F, 0.0F)
         );
 
-        ModelPartData right_leg = root.addChild(
-            "right_leg",
-            ModelPartBuilder.create()
-                            .uv(0, 24)
-                            .mirrored(false)
-                            .cuboid(-0.5F, 0.0F, -2.0F, 1.0F, 3.0F, 2.0F, new Dilation(0.0F)),
-            ModelTransform.of(-1.0F, 21.0F, 0.5F, 0.0F, 0.0F, 0.0F)
-        );
-
         ModelPartData left_leg = root.addChild(
             "left_leg",
             ModelPartBuilder.create()
@@ -134,6 +131,15 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
                             .mirrored(false)
                             .cuboid(-0.5F, 0.0F, -2.0F, 1.0F, 3.0F, 2.0F, new Dilation(0.0F)),
             ModelTransform.of(1.0F, 21.0F, 0.5F, 0.0F, 0.0F, 0.0F)
+        );
+
+        ModelPartData right_leg = root.addChild(
+            "right_leg",
+            ModelPartBuilder.create()
+                            .uv(0, 24)
+                            .mirrored(false)
+                            .cuboid(-0.5F, 0.0F, -2.0F, 1.0F, 3.0F, 2.0F, new Dilation(0.0F)),
+            ModelTransform.of(-1.0F, 21.0F, 0.5F, 0.0F, 0.0F, 0.0F)
         );
 
         return TexturedModelData.of(data, 48, 32);
@@ -144,39 +150,42 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
         limbDistance = MathHelper.clamp(limbDistance, -0.35F, 0.35F);
         float speed = 1.5f;
         float degree = 1.25f;
-        this.right_wing.roll = 0.0F;
-        this.left_wing.roll = 0.0F;
-        this.left_wing.yaw = 0.0F;
-        this.right_wing.yaw = 0.0F;
+        this.rightWing.roll = 0.0F;
+        this.leftWing.roll = 0.0F;
+        this.leftWing.yaw = 0.0F;
+        this.rightWing.yaw = 0.0F;
         this.body.pitch = 0.4F;
+        this.body.pivotY = 18.0F;
         this.tail.pitch = - 0.8F;
-        this.left_leg.pitch = 0.0F;
-        this.right_leg.pitch = 0.0F;
+        this.leftLeg.pitch = 0.0F;
+        this.rightLeg.pitch = 0.0F;
         this.head.pivotZ = - 3.5F;
-        this.head.pitch = headPitch * 0.017453292F;
-        this.head.yaw = headYaw * 0.017453292F;
+        this.head.pitch = headPitch * (float) (Math.PI / 180);
+        this.head.yaw = headYaw * (float) (Math.PI / 180);
+        this.head.pivotY = 15.0F;
 
-        if (!entity.isOnGround()) {
-            this.right_wing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * degree * 2.0F * 0.25F + 0.5F;
-            this.left_wing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * degree * -2.0F * 0.25F - 0.5F;
-            this.left_wing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * degree * -1.0F * 0.25F;
-            this.right_wing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * degree * 1.0F * 0.25F;
+        if (entity.isInAir()) {
+            this.rightWing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * degree * 2.0F * 0.25F + 0.5F;
+            this.leftWing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * degree * -2.0F * 0.25F - 0.5F;
+            this.leftWing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * degree * -1.0F * 0.25F;
+            this.rightWing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * degree * 1.0F * 0.25F;
             this.body.pitch = MathHelper.cos(animationProgress * speed * 0.25F) * degree * 0.2F * 0.25F + 0.4F;
             this.tail.pitch = MathHelper.cos(-10.0F + animationProgress * speed * 0.25F) * degree * 0.3F * 0.25F - 0.8F;
             this.body.pivotY = MathHelper.cos(limbAngle * speed * 0.5F) * degree * 1.5F * limbDistance + 18.0F;
             this.head.pitch = MathHelper.cos(animationProgress * speed * 0.25F) * degree * 0.2F * 0.25F;
             this.head.pivotY = MathHelper.cos(-1.0F + limbAngle * speed * 0.5F) * degree * 1.5F * limbDistance + 15.0F;
-            this.left_leg.pitch = MathHelper.cos(animationProgress * speed * 0.5F) * degree * 0.4F * 0.25F + 0.8F;
-            this.right_leg.pitch = MathHelper.cos(-2.0F + animationProgress * speed * 0.5F) * degree * -0.4F * 0.25F + 0.8F;
+            this.leftLeg.pitch = MathHelper.cos(animationProgress * speed * 0.5F) * degree * 0.4F * 0.25F + 0.8F;
+            this.rightLeg.pitch = MathHelper.cos(-2.0F + animationProgress * speed * 0.5F) * degree * -0.4F * 0.25F + 0.8F;
         }
+
         if (entity.isInSittingPose()) {
             this.body.pitch = 0.0F;
             this.tail.pitch = 0.8F;
             this.head.pivotY = 14.4F;
             this.head.pivotZ = - 2.0F;
-            this.left_leg.pitch = -0.75F;
-            this.right_leg.pitch = -0.75F;
-            this.body.pivotY = + 18.125F;
+            this.leftLeg.pitch = -0.75F;
+            this.rightLeg.pitch = -0.75F;
+            this.body.pivotY = 18.125F;
         }
 
         //if (entity.isWhistling()) {
@@ -196,6 +205,6 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
 
     @Override
     protected Iterable<ModelPart> getBodyParts() {
-        return ImmutableList.of(this.body, this.left_leg, this.right_leg);
+        return ImmutableList.of(this.body, this.leftLeg, this.rightLeg);
     }
 }
