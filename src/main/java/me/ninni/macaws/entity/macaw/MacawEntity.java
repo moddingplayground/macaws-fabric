@@ -133,30 +133,6 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
 
-        if (!this.isTamed() && TAMING_INGREDIENTS.contains(stack.getItem())) {
-            if (!player.getAbilities().creativeMode) stack.decrement(1);
-
-            if (!this.isSilent()) {
-                this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0f, 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f); // TODO
-            }
-
-            if (!this.world.isClient) {
-                if (this.random.nextInt(10) == 0) {
-                    this.setOwner(player);
-                    this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
-                } else {
-                    this.world.sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
-                }
-            }
-
-            return ActionResult.success(this.world.isClient);
-        }
-
-        if (!this.isInAir() && this.isTamed() && this.isOwner(player)) {
-            if (!this.world.isClient) this.setSitting(!this.isSitting());
-            return ActionResult.success(this.world.isClient);
-        }
-
         if (!this.world.isClient) {
             if (this.hasEyepatch()) {
                 if (FabricToolTags.SHEARS.contains(stack.getItem())) {
@@ -186,6 +162,30 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
                     return ActionResult.SUCCESS;
                 }
             }
+        }
+
+        if (!this.isInAir() && this.isTamed() && this.isOwner(player)) {
+            if (!this.world.isClient) this.setSitting(!this.isSitting());
+            return ActionResult.success(this.world.isClient);
+        }
+
+        if (!this.isTamed() && TAMING_INGREDIENTS.contains(stack.getItem())) {
+            if (!player.getAbilities().creativeMode) stack.decrement(1);
+
+            if (!this.isSilent()) {
+                this.world.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_PARROT_EAT, this.getSoundCategory(), 1.0f, 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f); // TODO
+            }
+
+            if (!this.world.isClient) {
+                if (this.random.nextInt(10) == 0) {
+                    this.setOwner(player);
+                    this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
+                } else {
+                    this.world.sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
+                }
+            }
+
+            return ActionResult.success(this.world.isClient);
         }
 
         return super.interactMob(player, hand);
