@@ -39,6 +39,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -49,6 +50,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -74,6 +76,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     private static final TrackedData<Variant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
     private static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private static final TrackedData<Personality> PERSONALITY = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_PERSONALITY);
+    private static final TrackedData<Integer> RING_COLOR = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     public static final float PITCH_DEVIANCE = 0.125f;
 
@@ -126,6 +129,13 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     }
 
     // getters/setters
+    public DyeColor getRingColor () {
+        return DyeColor.byId(this.dataTracker.get(RING_COLOR));
+    }
+
+    public void setRingColor (DyeColor color){
+        this.dataTracker.set(RING_COLOR, color.getId());
+    }
     public Variant getVariant() {
         return this.dataTracker.get(VARIANT);
     }
@@ -154,6 +164,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
+        Item item = stack.getItem();
 
         if (!this.world.isClient) {
             if (this.hasEyepatch()) {
@@ -181,6 +192,32 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
                     this.world.playSoundFromEntity(null, this, SoundEvents.BLOCK_WOOL_PLACE, SoundCategory.PLAYERS, 1.0f, 1.0f); // TODO
                     this.emitGameEvent(GameEvent.MOB_INTERACT, player);
                     stack.decrement(1);
+                    return ActionResult.SUCCESS;
+                }
+            }
+
+            if (this.isTamed()) {
+
+                if (!(item instanceof DyeItem)) {
+                    ActionResult actionResult = super.interactMob(player, hand);
+                    if ((!actionResult.isAccepted() || this.isBaby()) && this.isOwner(player)) {
+                        this.setSitting(!this.isSitting());
+                        this.jumping = false;
+                        this.navigation.stop();
+                        this.setTarget(null);
+                        return ActionResult.SUCCESS;
+                    }
+
+                    return actionResult;
+                }
+
+                DyeColor dyeColor = ((DyeItem)item).getColor();
+                if (dyeColor != this.getRingColor()) {
+                    this.setRingColor(dyeColor);
+                    if (!player.getAbilities().creativeMode) {
+                        stack.decrement(1);
+                    }
+
                     return ActionResult.SUCCESS;
                 }
             }
@@ -325,6 +362,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         this.dataTracker.startTracking(VARIANT, Variant.SCARLET);
         this.dataTracker.startTracking(HAS_EYEPATCH, false);
         this.dataTracker.startTracking(PERSONALITY, Personality.EMPTY);
+        this.dataTracker.startTracking(RING_COLOR, DyeColor.RED.getId());
     }
 
     @Override
@@ -333,6 +371,7 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         this.getVariant().writeToNbt(nbt);
         nbt.putBoolean(NBT_HAS_EYEPATCH, this.hasEyepatch());
         this.getPersonality().writeToNbt(nbt);
+        nbt.putByte("RingColor", (byte) this.getRingColor().getId());
     }
 
     @Override
@@ -341,6 +380,9 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         this.setVariant(Variant.readFromNbt(nbt));
         this.setHasEyepatch(nbt.getBoolean(NBT_HAS_EYEPATCH));
         this.setPersonality(Personality.readFromNbt(nbt));
+        if (nbt.contains("BandanaColor", 99)) {
+            this.setRingColor(DyeColor.byId(nbt.getInt("RingColor")));
+        }
     }
 
     public static class WanderGoal extends FlyGoal {

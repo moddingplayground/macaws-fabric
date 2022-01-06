@@ -19,6 +19,7 @@ public class MacawEntityRenderer<T extends MacawEntity> extends MobEntityRendere
     public MacawEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new MacawEntityModel<>(ctx.getPart(MacawEntityModelLayers.MACAW)), 0.3f);
         this.addFeature(new MacawEyepatchFeatureRenderer<>(this, new MacawEntityModel<>(ctx.getPart(MacawEntityModelLayers.MACAW_EYEPATCH)), TEXTURE_EYEPATCH));
+        this.addFeature(new MacawRingFeatureRenderer<>(this));
     }
 
     @Override
