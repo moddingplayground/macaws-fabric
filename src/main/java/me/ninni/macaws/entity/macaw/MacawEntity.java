@@ -160,13 +160,15 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         if (!this.world.isClient) {
             if (this.hasEyepatch()) {
                 if (FabricToolTags.SHEARS.contains(stack.getItem())) {
-                    ItemEntity itemEntity = this.dropItem(EYEPATCH_GIVE_ITEM, 1);
-                    if (itemEntity != null) {
-                        itemEntity.addVelocity(
-                            (this.random.nextFloat() - this.random.nextFloat()) * 0.1f,
-                            this.random.nextFloat() * 0.05f,
-                            (this.random.nextFloat() - this.random.nextFloat()) * 0.1f
-                        );
+                    if (!player.getAbilities().creativeMode) {
+                        ItemEntity itemEntity = this.dropItem(EYEPATCH_GIVE_ITEM, 1);
+                        if (itemEntity != null) {
+                            itemEntity.addVelocity(
+                                (this.random.nextFloat() - this.random.nextFloat()) * 0.1f,
+                                this.random.nextFloat() * 0.05f,
+                                (this.random.nextFloat() - this.random.nextFloat()) * 0.1f
+                            );
+                        }
                     }
 
                     this.world.playSoundFromEntity(null, this, SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.PLAYERS, 1.0f, 1.0f); // TODO
