@@ -1,20 +1,16 @@
 package me.ninni.macaws.client.model.entity;
 
+import com.google.common.collect.ImmutableList;
 import me.ninni.macaws.entity.macaw.MacawEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.model.Dilation;
-import net.minecraft.client.model.ModelData;
-import net.minecraft.client.model.ModelPart;
-import net.minecraft.client.model.ModelPartBuilder;
-import net.minecraft.client.model.ModelPartData;
-import net.minecraft.client.model.ModelTransform;
-import net.minecraft.client.model.TexturedModelData;
-import net.minecraft.client.render.entity.model.SinglePartEntityModel;
+import net.minecraft.client.model.*;
+import net.minecraft.client.render.entity.model.AnimalModel;
+import net.minecraft.util.math.MathHelper;
 
 @SuppressWarnings({ "FieldCanBeLocal", "unused" })
 @Environment(EnvType.CLIENT)
-public class MacawEntityModel<T extends MacawEntity> extends SinglePartEntityModel<T> {
+public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
     private final ModelPart root;
 
     private final ModelPart body;
@@ -144,10 +140,62 @@ public class MacawEntityModel<T extends MacawEntity> extends SinglePartEntityMod
     }
 
     @Override
-    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {}
+    public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+        limbDistance = MathHelper.clamp(limbDistance, -0.35F, 0.35F);
+        float speed = 1.5f;
+        float degree = 1.25f;
+        this.right_wing.roll = 0.0F;
+        this.left_wing.roll = 0.0F;
+        this.left_wing.yaw = 0.0F;
+        this.right_wing.yaw = 0.0F;
+        this.body.pitch = 0.4F;
+        this.tail.pitch = - 0.8F;
+        this.left_leg.pitch = 0.0F;
+        this.right_leg.pitch = 0.0F;
+        this.head.pivotZ = - 3.5F;
+        this.head.pitch = headPitch * 0.017453292F;
+        this.head.yaw = headYaw * 0.017453292F;
+
+        if (!entity.isOnGround()) {
+            this.right_wing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * degree * 2.0F * 0.25F + 0.5F;
+            this.left_wing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * degree * -2.0F * 0.25F - 0.5F;
+            this.left_wing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * degree * -1.0F * 0.25F;
+            this.right_wing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * degree * 1.0F * 0.25F;
+            this.body.pitch = MathHelper.cos(animationProgress * speed * 0.25F) * degree * 0.2F * 0.25F + 0.4F;
+            this.tail.pitch = MathHelper.cos(-10.0F + animationProgress * speed * 0.25F) * degree * 0.3F * 0.25F - 0.8F;
+            this.body.pivotY = MathHelper.cos(limbAngle * speed * 0.5F) * degree * 1.5F * limbDistance + 18.0F;
+            this.head.pitch = MathHelper.cos(animationProgress * speed * 0.25F) * degree * 0.2F * 0.25F;
+            this.head.pivotY = MathHelper.cos(-1.0F + limbAngle * speed * 0.5F) * degree * 1.5F * limbDistance + 15.0F;
+            this.left_leg.pitch = MathHelper.cos(animationProgress * speed * 0.5F) * degree * 0.4F * 0.25F + 0.8F;
+            this.right_leg.pitch = MathHelper.cos(-2.0F + animationProgress * speed * 0.5F) * degree * -0.4F * 0.25F + 0.8F;
+        }
+        if (entity.isInSittingPose()) {
+            this.body.pitch = 0.0F;
+            this.tail.pitch = 0.8F;
+            this.head.pivotY = 14.4F;
+            this.head.pivotZ = - 2.0F;
+            this.left_leg.pitch = -0.75F;
+            this.right_leg.pitch = -0.75F;
+            this.body.pivotY = + 18.125F;
+        }
+
+        //if (entity.isWhistling()) {
+        //this.beak.pitch = MathHelper.cos(limbAngle * speed * 0.1F) * degree * 0.3F * limbDistance - 0.2F;
+        //this.jaw.pitch = MathHelper.cos(-1.0F + limbAngle * speed * 0.1F) * degree * 0.4F * limbDistance + 0.1F;
+        //this.head.roll = MathHelper.cos(limbAngle * speed * 0.05F) * degree * 0.4F * limbDistance;
+        //this.body.roll = MathHelper.cos(-1.0F + limbAngle * speed * 0.05F) * degree * 0.4F * limbDistance;
+        //this.tail.roll = MathHelper.cos(-1.0F + limbAngle * speed * 0.05F) * degree * 0.8F * limbDistance;
+        //}
+
+    }
 
     @Override
-    public ModelPart getPart() {
-        return this.root;
+    protected Iterable<ModelPart> getHeadParts() {
+        return ImmutableList.of(this.head);
+    }
+
+    @Override
+    protected Iterable<ModelPart> getBodyParts() {
+        return ImmutableList.of(this.body, this.left_leg, this.right_leg);
     }
 }
