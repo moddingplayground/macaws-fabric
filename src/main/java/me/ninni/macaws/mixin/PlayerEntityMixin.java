@@ -89,12 +89,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     @Override
     public void dropHeadEntity(NbtCompound nbt) {
         if (!this.world.isClient && !nbt.isEmpty()) {
-            float health = nbt.getFloat("Health");
             EntityType.getEntityFromNbt(nbt, this.world).ifPresent(entity -> {
                 if (entity instanceof TameableEntity tameable) tameable.setOwnerUuid(this.uuid);
                 entity.setPosition(this.getX(), this.getY() + (double)0.7f, this.getZ());
                 ((ServerWorld)this.world).tryLoadEntity(entity);
-                if (entity instanceof LivingEntity livingEntity) livingEntity.setHealth(health);
+                if (entity instanceof LivingEntity livingEntity) livingEntity.setHealth(nbt.getFloat("Health"));
             });
         }
     }
