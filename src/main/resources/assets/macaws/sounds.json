@@ -29,7 +29,11 @@
       "macaws:entity/macaw/tamed/ambient1",
       "macaws:entity/macaw/tamed/ambient2",
       "macaws:entity/macaw/tamed/ambient3",
-      "macaws:entity/macaw/tamed/ambient4"
+      "macaws:entity/macaw/tamed/ambient4",
+      "macaws:entity/macaw/tamed/ambient5",
+      "macaws:entity/macaw/tamed/ambient6",
+      "macaws:entity/macaw/tamed/ambient7",
+      "macaws:entity/macaw/tamed/ambient8"
     ],
     "subtitle": "subtitles.entity.macaws:macaw.ambient_tamed"
   },
