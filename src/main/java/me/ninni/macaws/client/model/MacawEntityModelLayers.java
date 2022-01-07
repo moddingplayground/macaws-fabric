@@ -25,6 +25,6 @@ public class MacawEntityModelLayers {
     }
 
     private static EntityModelLayer registerMain(String id) {
-        return EntityModelLayersInvoker.invoke_register(new Identifier(Macaws.MOD_ID, id).toString(), "main");
+        return EntityModelLayersInvoker.invokeRegister(new Identifier(Macaws.MOD_ID, id).toString(), "main");
     }
 }

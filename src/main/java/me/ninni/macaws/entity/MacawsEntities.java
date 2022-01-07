@@ -1,6 +1,8 @@
 package me.ninni.macaws.entity;
 
 import me.ninni.macaws.Macaws;
+import me.ninni.macaws.entity.access.HeadMountAccess;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
@@ -10,7 +12,9 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.registry.Registry;
@@ -30,6 +34,19 @@ public class MacawsEntities {
                                .trackRangeChunks(8),
         colors(0x2864C7, 0xFBCA0C)
     );
+
+    static {
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            if (!world.isClient) {
+                ItemStack stack = player.getStackInHand(hand);
+                if (stack.isEmpty() && player.isSneaking()) {
+                    ((HeadMountAccess) player).tryDropHeadEntity();
+                }
+            }
+
+            return ActionResult.PASS;
+        });
+    }
 
     @SuppressWarnings("unchecked")
     private static <T extends Entity> EntityType<T> register(String id, FabricEntityTypeBuilder<T> entityType, Pair<Integer, Integer> colors, SpawnEggFactory eggFactory) {

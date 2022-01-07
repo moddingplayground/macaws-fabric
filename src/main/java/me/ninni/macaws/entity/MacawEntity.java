@@ -1,6 +1,7 @@
 package me.ninni.macaws.entity;
 
 import com.google.common.collect.ImmutableSet;
+import me.ninni.macaws.entity.access.HeadMountAccess;
 import me.ninni.macaws.entity.data.MacawsTrackedDataHandlerRegistry;
 import me.ninni.macaws.entity.data.TrackedDataPackager;
 import me.ninni.macaws.sound.MacawsSoundEvents;
@@ -72,7 +73,7 @@ import static me.ninni.macaws.client.util.ClientUtil.*;
 import static me.ninni.macaws.util.MacawsNbtConstants.*;
 import static net.minecraft.nbt.NbtElement.*;
 
-public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer {
+public class MacawEntity extends TameableHeadEntity implements Flutterer {
     public static final TrackedData<Variant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
     public static final TrackedData<Personality> PERSONALITY = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_PERSONALITY);
     public static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -132,8 +133,8 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         this.goalSelector.add(1, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
         this.goalSelector.add(2, new SitGoal(this));
         this.goalSelector.add(2, new FollowOwnerGoal(this, 1.0D, 5.0f, 1.0f, true));
-        this.goalSelector.add(2, new WanderGoal(this, 1.0));
-        // this.goalSelector.add(3, new SitOnOwnerShoulderGoal(this));
+        this.goalSelector.add(2, new WanderGoal(this, 1.0D));
+        this.goalSelector.add(3, new SitOnOwnerHeadGoal(this));
         this.goalSelector.add(3, new FollowMobGoal(this, 1.0, 3.0f, 7.0f));
     }
 
@@ -170,7 +171,51 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         this.dataTracker.set(RING_COLOR, color.getId());
     }
 
+    public Pose getMacawPose() {
+        if (this.isInAir()) return Pose.AIR;
+        if (this.isInSittingPose()) return Pose.SITTING;
+        return Pose.NORMAL;
+    }
+
     // tick
+    @Override
+    public void tickMovement() {
+        super.tickMovement();
+        this.flapWings();
+        if (this.isAlive()) tickSpeech(this);
+    }
+
+    public void flapWings() {
+        this.prevMaxWingDeviation = this.maxWingDeviation;
+        this.maxWingDeviation = (float)((double)this.maxWingDeviation + (double)(this.onGround || this.hasVehicle() ? -1 : 4) * 0.3);
+        this.maxWingDeviation = MathHelper.clamp(this.maxWingDeviation, 0.0f, 1.0f);
+
+        if (!this.onGround && this.flapSpeed < 1.0f) this.flapSpeed = 1.0f;
+        this.flapSpeed = (float)((double)this.flapSpeed * 0.9);
+
+        this.prevFlapProgress = this.flapProgress;
+        this.flapProgress += this.flapSpeed * 2.0f;
+
+        Vec3d vel = this.getVelocity();
+        if (!this.onGround && vel.y < 0.0) this.setVelocity(vel.multiply(1.0, 0.6, 1.0));
+    }
+
+    public static void tickSpeech(Entity source) {
+        if (source.world.isClient) return;
+
+        if (source instanceof PlayerEntity player) { // if mounted
+            NbtCompound nbt = ((HeadMountAccess) player).getHeadEntity();
+            Personality personality = Personality.readFromNbt(nbt);
+
+            Random random = player.getRandom();
+            if (random.nextInt(400) == 0) {
+                player.playSound(getAmbientSound(true, random), SoundCategory.NEUTRAL, 1.0f, personality.pitch());
+            }
+        } else if (source instanceof MacawEntity macaw) {
+            Personality personality = macaw.getPersonality();
+        }
+    }
+
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
@@ -270,33 +315,6 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
         return super.interactMob(player, hand);
     }
 
-    @Override
-    public void tickMovement() {
-        super.tickMovement();
-        this.flapWings();
-    }
-
-    public void flapWings() {
-        this.prevMaxWingDeviation = this.maxWingDeviation;
-        this.maxWingDeviation = (float)((double)this.maxWingDeviation + (double)(this.onGround || this.hasVehicle() ? -1 : 4) * 0.3);
-        this.maxWingDeviation = MathHelper.clamp(this.maxWingDeviation, 0.0f, 1.0f);
-
-        if (!this.onGround && this.flapSpeed < 1.0f) this.flapSpeed = 1.0f;
-        this.flapSpeed = (float)((double)this.flapSpeed * 0.9);
-
-        this.prevFlapProgress = this.flapProgress;
-        this.flapProgress += this.flapSpeed * 2.0f;
-
-        Vec3d vel = this.getVelocity();
-        if (!this.onGround && vel.y < 0.0) this.setVelocity(vel.multiply(1.0, 0.6, 1.0));
-    }
-
-    @Override
-    protected void dropInventory() {
-        super.dropInventory();
-        if (this.hasEyepatch()) this.dropItem(EYEPATCH_GIVE_ITEM);
-    }
-
     // misc
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -322,6 +340,12 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     }
 
     @Override
+    protected void dropInventory() {
+        super.dropInventory();
+        if (this.hasEyepatch()) this.dropItem(EYEPATCH_GIVE_ITEM);
+    }
+
+    @Override
     public float getSoundPitch() {
         return this.getPersonality().pitch() + (this.random.nextFloat(PITCH_DEVIANCE * 2) - PITCH_DEVIANCE);
     }
@@ -333,7 +357,11 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return this.isTamed() ? MacawsSoundEvents.ENTITY_MACAW_AMBIENT_TAMED : MacawsSoundEvents.ENTITY_MACAW_AMBIENT;
+        return getAmbientSound(this.isTamed(), this.random);
+    }
+
+    public static SoundEvent getAmbientSound(boolean tamed, Random random) {
+        return tamed ? MacawsSoundEvents.ENTITY_MACAW_AMBIENT_TAMED : MacawsSoundEvents.ENTITY_MACAW_AMBIENT;
     }
 
     @Override
@@ -407,8 +435,8 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(VARIANT, Variant.SCARLET);
-        this.dataTracker.startTracking(HAS_EYEPATCH, false);
         this.dataTracker.startTracking(PERSONALITY, Personality.EMPTY);
+        this.dataTracker.startTracking(HAS_EYEPATCH, false);
         this.dataTracker.startTracking(RING_COLOR, DyeColor.RED.getId());
     }
 
@@ -552,5 +580,9 @@ public class MacawEntity extends AbstractTameableHeadEntity implements Flutterer
             float pitchRnd = ((float) (int) (pitch * DECIMAL_ACCURACY)) / DECIMAL_ACCURACY;
             return new Personality(pitchRnd);
         }
+    }
+
+    public enum Pose {
+        NORMAL, AIR, SITTING, WHISTLING
     }
 }
