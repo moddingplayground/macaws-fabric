@@ -5,13 +5,13 @@ import me.ninni.macaws.entity.MacawsEntities;
 import me.ninni.macaws.entity.access.HeadMountAccess;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -99,22 +99,29 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     }
 
     @Override
-    public void tryDropHeadEntity() {
+    public void tryDropHeadEntity(Vec3d pos) {
         if (this.headEntityAddedTime + 20L < this.world.getTime()) {
-            this.dropHeadEntity(this.getHeadEntity());
+            this.dropHeadEntity(this.getHeadEntity(), pos);
             this.setHeadEntity(new NbtCompound());
             this.resetMountedMacawAmbientSoundChance();
         }
     }
 
     @Override
-    public void dropHeadEntity(NbtCompound nbt) {
+    public void tryDropHeadEntity() {
+        this.tryDropHeadEntity(new Vec3d(this.getX(), this.getY() + 0.7D, this.getZ()));
+    }
+
+    @Override
+    public void dropHeadEntity(NbtCompound nbt, Vec3d pos) {
         if (!this.world.isClient && !nbt.isEmpty()) {
             EntityType.getEntityFromNbt(nbt, this.world).ifPresent(entity -> {
-                if (entity instanceof TameableEntity tameable) tameable.setOwnerUuid(this.uuid);
-                entity.setPosition(this.getX(), this.getY() + (double)0.7f, this.getZ());
-                ((ServerWorld)this.world).tryLoadEntity(entity);
-                if (entity instanceof LivingEntity livingEntity) livingEntity.setHealth(nbt.getFloat("Health"));
+                if (entity instanceof MacawEntity macaw) {
+                    macaw.setOwnerUuid(this.uuid);
+                    macaw.setPosition(pos);
+                    ((ServerWorld)this.world).tryLoadEntity(macaw);
+                    macaw.setHealth(nbt.getFloat("Health"));
+                }
             });
         }
     }

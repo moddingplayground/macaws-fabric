@@ -17,6 +17,8 @@ import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 
 public class MacawsEntities {
@@ -36,11 +38,13 @@ public class MacawsEntities {
     );
 
     static {
-        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+        UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
             if (!world.isClient) {
                 ItemStack stack = player.getStackInHand(hand);
                 if (stack.isEmpty() && player.isSneaking()) {
-                    ((HeadMountAccess) player).tryDropHeadEntity();
+                    Direction side = hit.getSide();
+                    Vec3d pos = hit.getPos();
+                    ((HeadMountAccess) player).tryDropHeadEntity(pos.add(Vec3d.of(side.getVector())));
                 }
             }
 
