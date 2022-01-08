@@ -130,7 +130,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
     @Override
     public boolean canHeadMount() {
-        return !this.isTouchingWater() && !this.inPowderSnow;
+        return !this.isTouchingWater() && !this.inPowderSnow && !this.isSpectator();
     }
 
     @Override
