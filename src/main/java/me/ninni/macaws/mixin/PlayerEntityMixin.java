@@ -99,17 +99,19 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     }
 
     @Override
-    public void tryDropHeadEntity(Vec3d pos) {
-        if (this.headEntityAddedTime + 20L < this.world.getTime()) {
+    public boolean tryDropHeadEntity(Vec3d pos) {
+        if (this.canHeadDismount()) {
             this.dropHeadEntity(this.getHeadEntity(), pos);
             this.setHeadEntity(new NbtCompound());
             this.resetMountedMacawAmbientSoundChance();
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void tryDropHeadEntity() {
-        this.tryDropHeadEntity(new Vec3d(this.getX(), this.getY() + 0.7D, this.getZ()));
+    public boolean tryDropHeadEntity() {
+        return this.tryDropHeadEntity(new Vec3d(this.getX(), this.getY() + 0.7D, this.getZ()));
     }
 
     @Override
@@ -129,5 +131,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     @Override
     public boolean canHeadMount() {
         return !this.isTouchingWater() && !this.inPowderSnow;
+    }
+
+    @Override
+    public boolean canHeadDismount() {
+        return !this.getHeadEntity().isEmpty() && this.headEntityAddedTime + 20L < this.world.getTime();
     }
 }

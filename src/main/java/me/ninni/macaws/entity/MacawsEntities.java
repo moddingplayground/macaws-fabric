@@ -9,17 +9,20 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.event.GameEvent;
 
 public class MacawsEntities {
     public static final EntityType<MacawEntity> MACAW = register(
@@ -39,12 +42,18 @@ public class MacawsEntities {
 
     static {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
-            if (!world.isClient) {
+            if (world instanceof ServerWorld serverWorld) {
                 ItemStack stack = player.getStackInHand(hand);
                 if (stack.isEmpty() && player.isSneaking()) {
-                    Direction side = hit.getSide();
-                    Vec3d pos = hit.getPos();
-                    ((HeadMountAccess) player).tryDropHeadEntity(pos.add(Vec3d.of(side.getVector())));
+                    MacawEntity dummy = MacawsEntities.MACAW.create(serverWorld, null, null, player, hit.getBlockPos().offset(hit.getSide()), SpawnReason.TRIGGERED, true, false);
+                    if (dummy != null) {
+                        Vec3d pos = dummy.getPos();
+                        BlockPos blockPos = new BlockPos(pos);
+                        if (world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty() && ((HeadMountAccess) player).tryDropHeadEntity(pos)) {
+                            world.emitGameEvent(GameEvent.ENTITY_PLACE, player);
+                            return ActionResult.SUCCESS;
+                        }
+                    }
                 }
             }
 

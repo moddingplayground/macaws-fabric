@@ -14,9 +14,10 @@ public interface HeadMountAccess {
     void setHeadEntity(NbtCompound nbt);
     boolean addHeadEntity(NbtCompound nbt);
 
-    void tryDropHeadEntity(Vec3d pos);
-    void tryDropHeadEntity();
+    boolean tryDropHeadEntity(Vec3d pos);
+    boolean tryDropHeadEntity();
     void dropHeadEntity(NbtCompound nbt, Vec3d pos);
 
     boolean canHeadMount();
+    boolean canHeadDismount();
 }
