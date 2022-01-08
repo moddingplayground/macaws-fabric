@@ -53,6 +53,15 @@
     "subtitle": "subtitles.entity.macaws:macaw.hurt_tamed"
   },
 
+  "entity.macaw.ambient_eyepatch": {
+    "sounds": [
+      "macaws:entity/macaw/eyepatch/ambient1",
+      "macaws:entity/macaw/eyepatch/ambient2",
+      "macaws:entity/macaw/eyepatch/ambient3"
+    ],
+    "subtitle": "subtitles.entity.macaws:macaw.ambient_eyepatch"
+  },
+
   "entity.macaw.eat": {
     "sounds": [
       "minecraft:mob/parrot/eat1",

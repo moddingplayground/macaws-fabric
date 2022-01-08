@@ -1,9 +1,10 @@
 package me.ninni.macaws.entity;
 
 import com.google.common.collect.ImmutableSet;
-import me.ninni.macaws.entity.access.HeadMountAccess;
 import me.ninni.macaws.entity.data.MacawsTrackedDataHandlerRegistry;
 import me.ninni.macaws.entity.data.TrackedDataPackager;
+import me.ninni.macaws.mixin.BoatEntityAccessor;
+import me.ninni.macaws.sound.EntitySoundGroup;
 import me.ninni.macaws.sound.MacawsSoundEvents;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -40,6 +41,7 @@ import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -172,9 +174,17 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     }
 
     public Pose getMacawPose() {
+        if (this.isInSittingPose() || this.hasVehicle()) return Pose.SITTING;
         if (this.isInAir()) return Pose.AIR;
-        if (this.isInSittingPose()) return Pose.SITTING;
         return Pose.NORMAL;
+    }
+
+    public EntitySoundGroup getSoundGroup() {
+        return getSoundGroup(this.isTamed());
+    }
+
+    public static EntitySoundGroup getSoundGroup(boolean tamed) {
+        return tamed ? EntitySoundGroup.MACAW_TAMED : EntitySoundGroup.MACAW;
     }
 
     // tick
@@ -182,7 +192,6 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     public void tickMovement() {
         super.tickMovement();
         this.flapWings();
-        if (this.isAlive()) tickSpeech(this);
     }
 
     public void flapWings() {
@@ -198,22 +207,6 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
 
         Vec3d vel = this.getVelocity();
         if (!this.onGround && vel.y < 0.0) this.setVelocity(vel.multiply(1.0, 0.6, 1.0));
-    }
-
-    public static void tickSpeech(Entity source) {
-        if (source.world.isClient) return;
-
-        if (source instanceof PlayerEntity player) { // if mounted
-            NbtCompound nbt = ((HeadMountAccess) player).getHeadEntity();
-            Personality personality = Personality.readFromNbt(nbt);
-
-            Random random = player.getRandom();
-            if (random.nextInt(400) == 0) {
-                player.playSound(getAmbientSound(true, random), SoundCategory.NEUTRAL, 1.0f, personality.pitch());
-            }
-        } else if (source instanceof MacawEntity macaw) {
-            Personality personality = macaw.getPersonality();
-        }
     }
 
     @Override
@@ -357,21 +350,19 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
 
     @Override
     protected SoundEvent getAmbientSound() {
-        return getAmbientSound(this.isTamed(), this.random);
-    }
-
-    public static SoundEvent getAmbientSound(boolean tamed, Random random) {
-        return tamed ? MacawsSoundEvents.ENTITY_MACAW_AMBIENT_TAMED : MacawsSoundEvents.ENTITY_MACAW_AMBIENT;
-    }
-
-    @Override
-    protected SoundEvent getDeathSound() {
-        return this.isTamed() ? MacawsSoundEvents.ENTITY_MACAW_DEATH_TAMED : MacawsSoundEvents.ENTITY_MACAW_DEATH;
+        return this.hasEyepatch() && this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER
+            ? MacawsSoundEvents.ENTITY_MACAW_AMBIENT_EYEPATCH
+            : this.getSoundGroup().getAmbient();
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return this.isTamed() ? MacawsSoundEvents.ENTITY_MACAW_HURT_TAMED : MacawsSoundEvents.ENTITY_MACAW_HURT;
+        return this.getSoundGroup().getHurt();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return this.getSoundGroup().getDeath();
     }
 
     @Override
@@ -541,8 +532,8 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     public record Personality(float pitch) implements TrackedDataPackager<Personality> {
         public static final Personality EMPTY = new Personality(1.0f);
 
-        public static final float MIN_PITCH = 0.5F;
-        public static final float MAX_PITCH = 1.5F;
+        public static final float MIN_PITCH = 0.85F;
+        public static final float MAX_PITCH = 1.1F;
         public static final int DECIMAL_ACCURACY = 100;
 
         public void writeToNbt(NbtCompound nbt) {

@@ -12,6 +12,10 @@
   "subtitles.entity.macaws:macaw.ambient_tamed": "Macaw chats",
   "subtitles.entity.macaws:macaw.death_tamed": "Macaw despairs",
   "subtitles.entity.macaws:macaw.hurt_tamed": "Macaw cries",
+  "subtitles.entity.macaws:macaw.ambient_eyepatch": "Macaw sings shanties",
+  "subtitles.entity.macaws:macaw.death_eyepatch": "Macaw curses",
+  "subtitles.entity.macaws:macaw.hurt_eyepatch": "Macaw oaths",
+
   "subtitles.entity.macaws:macaw.eat": "Macaw munches",
   "subtitles.entity.macaws:macaw.fly": "Macaw flaps",
   "subtitles.entity.macaws:macaw.equip_eyepatch": "Macaw equips eyepatch"

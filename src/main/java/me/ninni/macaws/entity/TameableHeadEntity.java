@@ -51,7 +51,7 @@ public abstract class TameableHeadEntity extends TameableEntity {
 
         @Override
         public boolean canStart() {
-            return this.mob.getOwner() instanceof HeadMountAccess access && !access.disallowHeadMount() && !this.mob.isSitting() && this.mob.isReadyToSitOnPlayer();
+            return this.mob.getOwner() instanceof HeadMountAccess access && access.canHeadMount() && !this.mob.isSitting() && this.mob.isReadyToSitOnPlayer();
         }
 
         @Override

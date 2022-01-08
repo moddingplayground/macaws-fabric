@@ -16,5 +16,5 @@ public interface HeadMountAccess {
     void tryDropHeadEntity();
     void dropHeadEntity(NbtCompound nbt);
 
-    boolean disallowHeadMount();
+    boolean canHeadMount();
 }

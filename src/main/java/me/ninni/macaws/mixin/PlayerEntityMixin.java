@@ -7,30 +7,55 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static me.ninni.macaws.sound.MacawsSoundEvents.*;
 import static me.ninni.macaws.util.MacawsNbtConstants.*;
 import static net.minecraft.nbt.NbtElement.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements HeadMountAccess {
+    @Shadow public abstract void playSound(SoundEvent event, SoundCategory category, float volume, float pitch);
+
     private long headEntityAddedTime;
+    private int mountedMacawAmbientSoundChance;
 
     private PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
 
+    private void resetMountedMacawAmbientSoundChance() {
+        this.mountedMacawAmbientSoundChance = -120;
+    }
+
     @Inject(method = "tickMovement", at = @At("TAIL"))
     private void onTickMovement(CallbackInfo ci) {
-        NbtCompound nbt = this.getHeadEntity();
-        if (nbt != null && EntityType.get(nbt.getString("id")).filter(type -> type == MacawsEntities.MACAW).isPresent()) {
-            MacawEntity.tickSpeech(this);
+        if (!this.world.isClient) {
+            NbtCompound nbt = this.getHeadEntity();
+            if (nbt != null && EntityType.get(nbt.getString("id")).filter(type -> type == MacawsEntities.MACAW).isPresent()) {
+                if (this.random.nextInt(1000) < this.mountedMacawAmbientSoundChance++) {
+                    MacawEntity.Personality personality = MacawEntity.Personality.readFromNbt(nbt);
+                    boolean eyepatch = nbt.getBoolean(NBT_HAS_EYEPATCH);
+                    boolean isInWaterBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
+
+                    this.playSound(
+                        eyepatch && isInWaterBoat ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED,
+                        SoundCategory.NEUTRAL, 1.0f, personality.pitch()
+                    );
+
+                    this.resetMountedMacawAmbientSoundChance();
+                }
+            }
         }
     }
 
@@ -62,7 +87,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
     @Override
     public boolean addHeadEntity(NbtCompound nbt) {
-        if (this.disallowHeadMount()) return false;
+        if (!this.canHeadMount()) return false;
 
         if (this.getHeadEntity().isEmpty()) {
             this.setHeadEntity(nbt);
@@ -78,6 +103,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
         if (this.headEntityAddedTime + 20L < this.world.getTime()) {
             this.dropHeadEntity(this.getHeadEntity());
             this.setHeadEntity(new NbtCompound());
+            this.resetMountedMacawAmbientSoundChance();
         }
     }
 
@@ -94,7 +120,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     }
 
     @Override
-    public boolean disallowHeadMount() {
-        return this.hasVehicle() || this.isTouchingWater() || this.inPowderSnow;
+    public boolean canHeadMount() {
+        return !this.isTouchingWater() && !this.inPowderSnow;
     }
 }
