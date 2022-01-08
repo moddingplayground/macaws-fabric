@@ -5,9 +5,6 @@ import me.ninni.macaws.entity.MacawsEntities;
 import me.ninni.macaws.entity.access.HeadMountAccess;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -23,8 +20,6 @@ import static net.minecraft.nbt.NbtElement.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements HeadMountAccess {
-    private static final TrackedData<NbtCompound> HEAD_ENTITY = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.TAG_COMPOUND);
-
     private long headEntityAddedTime;
 
     private PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {

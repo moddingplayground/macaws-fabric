@@ -2,6 +2,7 @@ package me.ninni.macaws;
 
 import com.google.common.reflect.Reflection;
 import me.ninni.macaws.entity.MacawsEntities;
+import me.ninni.macaws.entity.access.HeadMountAccess;
 import me.ninni.macaws.sound.MacawsSoundEvents;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
@@ -29,6 +30,7 @@ public class Macaws implements ModInitializer {
 
         Reflection.initialize(
             MacawsSoundEvents.class,
+            HeadMountAccess.class,
             MacawsEntities.class
         );
 
