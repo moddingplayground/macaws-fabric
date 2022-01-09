@@ -3,6 +3,9 @@
   "mod.macaws.contact.discord": "Discord",
   "itemGroup.macaws.item_group": "Macaws",
 
+  "mod.macaws.resource_pack.parakeets": "Parakeets",
+  "mod.macaws.resource_pack.parakeets.description": "Retextured parrots to differ from the Macaw's textures",
+
   "entity.macaws.macaw": "Macaw",
   "item.macaws.macaw_spawn_egg": "Macaw Spawn Egg",
 
