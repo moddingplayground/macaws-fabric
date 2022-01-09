@@ -9,4 +9,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "macaws"
+rootProject.name = "macaws-fabric"
