@@ -14,6 +14,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.nbt.NbtCompound;
@@ -80,7 +81,7 @@ public class MacawsEntities {
     private static <T extends Entity> EntityType<T> register(String id, FabricEntityTypeBuilder<T> entityType, Pair<Integer, Integer> colors, SpawnEggFactory eggFactory) {
         EntityType<T> builtEntityType = entityType.build();
         if (eggFactory != null) {
-            Item.Settings settings = new FabricItemSettings().maxCount(64).group(Macaws.ITEM_GROUP);
+            Item.Settings settings = new FabricItemSettings().maxCount(64).group(ItemGroup.MISC);
             Item item = eggFactory.apply((EntityType<? extends MobEntity>) builtEntityType, colors.getLeft(), colors.getRight(), settings);
             Registry.register(Registry.ITEM,  new Identifier(Macaws.MOD_ID, "%s_spawn_egg".formatted(id)), item);
         }

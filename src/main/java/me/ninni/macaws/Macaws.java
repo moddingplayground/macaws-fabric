@@ -18,11 +18,6 @@ public class Macaws implements ModInitializer {
     public static final String MOD_NAME = "Macaws";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-    public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.build(
-        new Identifier(MOD_ID, "item_group"),
-        () -> new ItemStack(SpawnEggItem.forEntity(MacawsEntities.MACAW))
-    );
-
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onInitialize() {
