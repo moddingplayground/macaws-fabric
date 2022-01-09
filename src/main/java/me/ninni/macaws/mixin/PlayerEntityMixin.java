@@ -14,7 +14,6 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -25,8 +24,6 @@ import static net.minecraft.nbt.NbtElement.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements HeadMountAccess {
-    @Shadow public abstract void playSound(SoundEvent event, SoundCategory category, float volume, float pitch);
-
     private long headEntityAddedTime;
     private int mountedMacawAmbientSoundChance;
 
@@ -50,11 +47,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                         MacawEntity.Personality personality = MacawEntity.Personality.readFromNbt(nbt);
                         boolean eyepatch = nbt.getBoolean(NBT_HAS_EYEPATCH);
                         boolean isInWaterBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
-
-                        this.playSound(
-                            eyepatch && isInWaterBoat ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED,
-                            SoundCategory.NEUTRAL, 1.0f, personality.pitch()
-                        );
+                        SoundEvent sound = eyepatch && isInWaterBoat ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
+                        MacawEntity.Personality personality = MacawEntity.Personality.readFromNbt(nbt);
+                        this.world.playSoundFromEntity(null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
 
                         this.resetMountedMacawAmbientSoundChance();
                     }
