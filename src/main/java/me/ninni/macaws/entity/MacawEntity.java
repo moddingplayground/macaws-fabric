@@ -426,7 +426,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(VARIANT, Variant.SCARLET);
-        this.dataTracker.startTracking(PERSONALITY, Personality.EMPTY);
+        this.dataTracker.startTracking(PERSONALITY, Personality.DEFAULT);
         this.dataTracker.startTracking(HAS_EYEPATCH, false);
         this.dataTracker.startTracking(RING_COLOR, DyeColor.RED.getId());
     }
@@ -530,7 +530,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     }
 
     public record Personality(float pitch) implements TrackedDataPackager<Personality> {
-        public static final Personality EMPTY = new Personality(1.0f);
+        public static final Personality DEFAULT = new Personality(1.0f);
 
         public static final float MIN_PITCH = 0.85F;
         public static final float MAX_PITCH = 1.1F;
@@ -548,7 +548,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
                 float pitch = personalityNbt.getFloat(NBT_PERSONALITY_PITCH);
                 return new Personality(pitch);
             }
-            return Personality.EMPTY;
+            return Personality.DEFAULT;
         }
 
         @Override

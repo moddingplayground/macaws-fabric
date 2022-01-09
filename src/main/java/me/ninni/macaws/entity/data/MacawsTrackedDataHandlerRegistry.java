@@ -11,7 +11,7 @@ public class MacawsTrackedDataHandlerRegistry {
     private static final ArrayList<TrackedDataHandler<?>> HANDLERS = new ArrayList<>();
 
     public static final TrackedDataHandler<Variant> MACAW_VARIANT = register(new EnumTrackedDataHandler<>(Variant.class));
-    public static final TrackedDataHandler<Personality> MACAW_PERSONALITY = register(new PackagerTrackedDataHandler<>(() -> Personality.EMPTY));
+    public static final TrackedDataHandler<Personality> MACAW_PERSONALITY = register(new PackagerTrackedDataHandler<>(() -> Personality.DEFAULT));
 
     static {
         HANDLERS.forEach(TrackedDataHandlerRegistryAccessor.getDATA_HANDLERS()::add);
