@@ -1,12 +1,12 @@
 package me.ninni.macaws.entity;
 
 import me.ninni.macaws.entity.access.HeadMountAccess;
+import me.ninni.macaws.sound.MacawsSoundEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
 
 public abstract class TameableHeadEntity extends TameableEntity {
@@ -22,7 +22,7 @@ public abstract class TameableHeadEntity extends TameableEntity {
         nbt.putString("id", this.getSavedEntityId());
         this.writeNbt(nbt);
         if (((HeadMountAccess) player).addHeadEntity(nbt)) {
-            this.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 0.3f, 0.9f + (this.random.nextFloat() * 0.2f));
+            player.world.playSound(null, player.getX(), player.getY(), player.getZ(), MacawsSoundEvents.ENTITY_MACAW_MOUNT_ON, this.getSoundCategory(), 0.3f, 0.9f + (this.random.nextFloat() * 0.2f));
             this.discard();
             return true;
         }

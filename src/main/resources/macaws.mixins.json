@@ -5,6 +5,7 @@
   "package": "me.ninni.macaws.mixin",
   "mixins": [
     "BoatEntityAccessor",
+    "EntityTypeMixin",
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin",
     "TrackedDataHandlerRegistryAccessor"

@@ -21,6 +21,9 @@ public class MacawsSoundEvents {
     public static final SoundEvent ENTITY_MACAW_SHEAR = macaw("shear");
     public static final SoundEvent ENTITY_MACAW_EQUIP_EYEPATCH = macaw("equip_eyepatch");
 
+    public static final SoundEvent ENTITY_MACAW_MOUNT_ON = macaw("mount_on");
+    public static final SoundEvent ENTITY_MACAW_MOUNT_OFF = macaw("mount_off");
+
     private static SoundEvent macaw(String id) {
         return entity("macaw", id);
     }

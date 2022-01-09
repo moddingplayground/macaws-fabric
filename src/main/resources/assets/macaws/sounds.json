@@ -97,5 +97,16 @@
       "minecraft:dig/cloth4"
     ],
     "subtitle": "subtitles.entity.macaws:macaw.equip_eyepatch"
+  },
+
+  "entity.macaw.mount_on": {
+    "sounds": [
+      "minecraft:random/pop"
+    ]
+  },
+  "entity.macaw.mount_off": {
+    "sounds": [
+      "minecraft:random/pop"
+    ]
   }
 }

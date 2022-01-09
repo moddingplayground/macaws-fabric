@@ -12,6 +12,8 @@ public class MacawsNbtConstants {
     public static final String NBT_PERSONALITY = create("macaw_personality");
     public static final String NBT_PERSONALITY_PITCH = "pitch";
 
+    public static final String NBT_SILENT = "Silent";
+
     private static String create(String id) {
         return new Identifier(Macaws.MOD_ID, id).toString();
     }

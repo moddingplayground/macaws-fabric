@@ -116,6 +116,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
         this.setVariant(Variant.random(this.random));
         this.setPersonality(Personality.random(this.random));
         if (data == null) data = new PassiveEntity.PassiveData(false);
+        if (nbt != null) this.setSilent(nbt.getBoolean(NBT_SILENT));
         return super.initialize(world, difficulty, spawnReason, data, nbt);
     }
 

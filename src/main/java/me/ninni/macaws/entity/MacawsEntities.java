@@ -2,6 +2,7 @@ package me.ninni.macaws.entity;
 
 import me.ninni.macaws.Macaws;
 import me.ninni.macaws.entity.access.HeadMountAccess;
+import me.ninni.macaws.sound.MacawsSoundEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
@@ -15,6 +16,7 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.SpawnEggItem;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -23,6 +25,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.event.GameEvent;
+
+import static me.ninni.macaws.util.MacawsNbtConstants.*;
 
 public class MacawsEntities {
     public static final EntityType<MacawEntity> MACAW = register(
@@ -42,17 +46,21 @@ public class MacawsEntities {
 
     static {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
+            ItemStack stack = player.getStackInHand(hand);
             HeadMountAccess access = (HeadMountAccess) player;
-            if (!access.getHeadEntity().isEmpty() && world instanceof ServerWorld serverWorld) {
-                ItemStack stack = player.getStackInHand(hand);
-                if (stack.isEmpty() && player.isSneaking()) {
-                    MacawEntity dummy = MacawsEntities.MACAW.create(serverWorld, null, null, player, hit.getBlockPos().offset(hit.getSide()), SpawnReason.TRIGGERED, true, false);
+
+            if (world instanceof ServerWorld serverWorld) {
+                if (!access.getHeadEntity().isEmpty() && stack.isEmpty() && player.isSneaking()) {
+                    MacawEntity dummy = MacawsEntities.MACAW.create(serverWorld, createSilentNbt(), null, null, hit.getBlockPos().offset(hit.getSide()), SpawnReason.TRIGGERED, true, false);
                     if (dummy != null) {
                         Vec3d pos = dummy.getPos();
-                        BlockPos blockPos = new BlockPos(pos);
-                        if (world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty() && access.tryDropHeadEntity(pos)) {
-                            world.emitGameEvent(GameEvent.ENTITY_PLACE, player);
-                            return ActionResult.SUCCESS;
+                        BlockPos bpos = new BlockPos(pos);
+                        if (world.getBlockState(bpos).getCollisionShape(world, bpos).isEmpty()) {
+                            if (access.tryDropHeadEntity(pos)) {
+                                world.emitGameEvent(GameEvent.ENTITY_PLACE, player);
+                                player.world.playSound(null, player.getX(), player.getY(), player.getZ(), MacawsSoundEvents.ENTITY_MACAW_MOUNT_OFF, player.getSoundCategory(), 0.3f, 0.3f + (player.getRandom().nextFloat() * 0.2f));
+                                return ActionResult.SUCCESS;
+                            }
                         }
                     }
                 }
@@ -60,6 +68,12 @@ public class MacawsEntities {
 
             return ActionResult.PASS;
         });
+    }
+
+    private static NbtCompound createSilentNbt() {
+        NbtCompound nbt = new NbtCompound();
+        nbt.putBoolean(NBT_SILENT, true);
+        return nbt;
     }
 
     @SuppressWarnings("unchecked")

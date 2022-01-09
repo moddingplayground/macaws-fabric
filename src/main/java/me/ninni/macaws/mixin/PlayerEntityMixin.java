@@ -46,7 +46,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
             } else {
                 NbtCompound nbt = this.getHeadEntity();
                 if (nbt != null && EntityType.get(nbt.getString("id")).filter(type -> type == MacawsEntities.MACAW).isPresent()) {
-                    if (this.random.nextInt(1000) < this.mountedMacawAmbientSoundChance++) {
+                    if (!nbt.getBoolean(NBT_SILENT) && this.random.nextInt(1000) < this.mountedMacawAmbientSoundChance++) {
                         MacawEntity.Personality personality = MacawEntity.Personality.readFromNbt(nbt);
                         boolean eyepatch = nbt.getBoolean(NBT_HAS_EYEPATCH);
                         boolean isInWaterBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
