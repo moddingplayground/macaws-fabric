@@ -5,11 +5,6 @@ import me.ninni.macaws.entity.MacawsEntities;
 import me.ninni.macaws.entity.access.HeadMountAccess;
 import me.ninni.macaws.sound.MacawsSoundEvents;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.SpawnEggItem;
-import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
