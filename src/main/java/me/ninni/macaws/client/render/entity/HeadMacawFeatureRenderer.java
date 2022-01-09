@@ -43,13 +43,16 @@ public class HeadMacawFeatureRenderer<T extends PlayerEntity, E extends MacawEnt
             this.getContextModel().head.rotate(matrices);
             matrices.translate(0.0D, -1.9D, 0.0D);
 
-            MacawEntity.Variant variant = MacawEntity.Variant.readFromNbt(nbt);
-            this.model.renderOnHead(matrices, this.getVertex(vertices, variant.getTexture()), light, OverlayTexture.DEFAULT_UV);
+            float maxDeg = 6;
+            float air = entity.isFallFlying() ? 1 : (entity.fallDistance > 2 ? 1 + maxDeg - Math.min(maxDeg, entity.fallDistance / 5) : 0);
 
-            if (nbt.getBoolean(NBT_HAS_EYEPATCH)) this.model.renderOnHead(matrices, this.getVertex(vertices, TEXTURE_EYEPATCH), light, OverlayTexture.DEFAULT_UV);
+            MacawEntity.Variant variant = MacawEntity.Variant.readFromNbt(nbt);
+            this.model.renderOnHead(matrices, this.getVertex(vertices, variant.getTexture()), light, OverlayTexture.DEFAULT_UV, animationProgress, air);
+
+            if (nbt.getBoolean(NBT_HAS_EYEPATCH)) this.model.renderOnHead(matrices, this.getVertex(vertices, TEXTURE_EYEPATCH), light, OverlayTexture.DEFAULT_UV, animationProgress, air);
             if (nbt.contains(NBT_RING_COLOR)) {
                 float[] col = DyeColor.byId(nbt.getInt(NBT_RING_COLOR)).getColorComponents();
-                this.model.renderOnHead(matrices, this.getVertex(vertices, TEXTURE_RING), light, OverlayTexture.DEFAULT_UV, col[0], col[1], col[2]);
+                this.model.renderOnHead(matrices, this.getVertex(vertices, TEXTURE_RING), light, OverlayTexture.DEFAULT_UV, animationProgress, air, col[0], col[1], col[2]);
             }
 
             matrices.pop();

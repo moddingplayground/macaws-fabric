@@ -149,13 +149,15 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
 
     @Override
     public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-        this.setAngles(entity.getMacawPose(), limbAngle, limbDistance, animationProgress, headYaw, headPitch);
+        this.setAngles(entity.getMacawPose(), 0, limbAngle, limbDistance, animationProgress, headYaw, headPitch, false);
     }
 
-    public void setAngles(MacawEntity.Pose pose, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
+    public void setAngles(MacawEntity.Pose pose, float air, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch, boolean mounted) {
         limbDistance = MathHelper.clamp(limbDistance, -0.35F, 0.35F);
+
         float speed = 1.5f;
         float degree = 1.25f;
+
         this.rightWing.roll = 0.0F;
         this.leftWing.roll = 0.0F;
         this.leftWing.yaw = 0.0F;
@@ -201,15 +203,29 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
                 this.tail.roll = MathHelper.cos(-1.0F + limbAngle * speed * 0.05F) * degree * 0.8F * limbDistance;
             }
         }
+
+        if (mounted) {
+            this.tail.pitch = -0.225F;
+            this.head.pitch = 0.35F;
+
+            if (pose == MacawEntity.Pose.AIR) {
+                float animProg = animationProgress / 2;
+                float deg = degree / air;
+                this.rightWing.roll = MathHelper.cos(-1.0F + animProg * speed * 1.0F) * deg * 2.0F * 0.25F + 0.25F;
+                this.leftWing.roll = MathHelper.cos(-1.0F + animProg * speed * 1.0F) * deg * -2.0F * 0.25F - 0.25F;
+                this.leftWing.yaw = MathHelper.cos(-1.0F + animProg * speed * 0.5F) * deg * -1.0F * 0.25F;
+                this.rightWing.yaw = MathHelper.cos(-1.0F + animProg * speed * 0.5F) * deg * 1.0F * 0.25F;
+            }
+        }
     }
 
-    public void renderOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay, float red, float green, float blue) {
-        this.setAngles(MacawEntity.Pose.SITTING, 0.0f, 0.0f, 0, 0.0f, 0.0f);
+    public void renderOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay, float animationProgress, float air, float red, float green, float blue) {
+        this.setAngles(air > 0 ? MacawEntity.Pose.AIR : MacawEntity.Pose.SITTING, air, 0.0f, 0.0f, animationProgress, 0.0f, 0.0f, true);
         this.root.render(matrices, vertex, light, overlay, red, green, blue, 1.0F);
     }
 
-    public void renderOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay) {
-        this.renderOnHead(matrices, vertex, light, overlay, 1.0F, 1.0F, 1.0F);
+    public void renderOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay, float animationProgress, float air) {
+        this.renderOnHead(matrices, vertex, light, overlay, animationProgress, air, 1.0F, 1.0F, 1.0F);
     }
 
     @Override
