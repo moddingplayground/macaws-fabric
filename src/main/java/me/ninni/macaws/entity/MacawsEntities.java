@@ -42,14 +42,15 @@ public class MacawsEntities {
 
     static {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
-            if (world instanceof ServerWorld serverWorld) {
+            HeadMountAccess access = (HeadMountAccess) player;
+            if (!access.getHeadEntity().isEmpty() && world instanceof ServerWorld serverWorld) {
                 ItemStack stack = player.getStackInHand(hand);
                 if (stack.isEmpty() && player.isSneaking()) {
                     MacawEntity dummy = MacawsEntities.MACAW.create(serverWorld, null, null, player, hit.getBlockPos().offset(hit.getSide()), SpawnReason.TRIGGERED, true, false);
                     if (dummy != null) {
                         Vec3d pos = dummy.getPos();
                         BlockPos blockPos = new BlockPos(pos);
-                        if (world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty() && ((HeadMountAccess) player).tryDropHeadEntity(pos)) {
+                        if (world.getBlockState(blockPos).getCollisionShape(world, blockPos).isEmpty() && access.tryDropHeadEntity(pos)) {
                             world.emitGameEvent(GameEvent.ENTITY_PLACE, player);
                             return ActionResult.SUCCESS;
                         }
