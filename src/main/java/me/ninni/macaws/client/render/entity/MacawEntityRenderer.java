@@ -14,8 +14,8 @@ import static me.ninni.macaws.client.util.ClientUtil.*;
 
 @Environment(EnvType.CLIENT)
 public class MacawEntityRenderer<T extends MacawEntity> extends MobEntityRenderer<T, MacawEntityModel<T>> {
-    private static final Identifier TEXTURE_EYEPATCH = entityTexture("macaw/macaw_eyepatch");
-    private static final Identifier TEXTURE_RING = entityTexture("macaw/macaw_ring");
+    public static final Identifier TEXTURE_EYEPATCH = entityTexture("macaw/macaw_eyepatch");
+    public static final Identifier TEXTURE_RING = entityTexture("macaw/macaw_ring");
 
     public MacawEntityRenderer(EntityRendererFactory.Context ctx) {
         super(ctx, new MacawEntityModel<>(ctx.getPart(MacawEntityModelLayers.MACAW)), 0.3f);

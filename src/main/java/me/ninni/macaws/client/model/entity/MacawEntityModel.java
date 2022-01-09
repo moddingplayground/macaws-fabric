@@ -203,9 +203,13 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
         }
     }
 
-    public void poseOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay) {
+    public void renderOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay, float red, float green, float blue) {
         this.setAngles(MacawEntity.Pose.SITTING, 0.0f, 0.0f, 0, 0.0f, 0.0f);
-        this.root.render(matrices, vertex, light, overlay);
+        this.root.render(matrices, vertex, light, overlay, red, green, blue, 1.0F);
+    }
+
+    public void renderOnHead(MatrixStack matrices, VertexConsumer vertex, int light, int overlay) {
+        this.renderOnHead(matrices, vertex, light, overlay, 1.0F, 1.0F, 1.0F);
     }
 
     @Override

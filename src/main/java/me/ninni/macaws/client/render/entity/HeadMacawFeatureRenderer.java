@@ -18,6 +18,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.DyeColor;
+import net.minecraft.util.Identifier;
+
+import static me.ninni.macaws.client.render.entity.MacawEntityRenderer.*;
+import static me.ninni.macaws.util.MacawsNbtConstants.*;
 
 @Environment(EnvType.CLIENT)
 public class HeadMacawFeatureRenderer<T extends PlayerEntity, E extends MacawEntity>
@@ -39,10 +44,19 @@ public class HeadMacawFeatureRenderer<T extends PlayerEntity, E extends MacawEnt
             matrices.translate(0.0D, -1.9D, 0.0D);
 
             MacawEntity.Variant variant = MacawEntity.Variant.readFromNbt(nbt);
-            VertexConsumer vertex = vertices.getBuffer(this.model.getLayer(variant.getTexture()));
-            this.model.poseOnHead(matrices, vertex, light, OverlayTexture.DEFAULT_UV);
+            this.model.renderOnHead(matrices, this.getVertex(vertices, variant.getTexture()), light, OverlayTexture.DEFAULT_UV);
+
+            if (nbt.getBoolean(NBT_HAS_EYEPATCH)) this.model.renderOnHead(matrices, this.getVertex(vertices, TEXTURE_EYEPATCH), light, OverlayTexture.DEFAULT_UV);
+            if (nbt.contains(NBT_RING_COLOR)) {
+                float[] col = DyeColor.byId(nbt.getInt(NBT_RING_COLOR)).getColorComponents();
+                this.model.renderOnHead(matrices, this.getVertex(vertices, TEXTURE_RING), light, OverlayTexture.DEFAULT_UV, col[0], col[1], col[2]);
+            }
 
             matrices.pop();
         }
+    }
+
+    public VertexConsumer getVertex(VertexConsumerProvider vertices, Identifier texture) {
+        return vertices.getBuffer(this.model.getLayer(texture));
     }
 }
