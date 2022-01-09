@@ -108,5 +108,103 @@
     "sounds": [
       "minecraft:random/pop"
     ]
+  },
+
+
+  "entity.macaw.speech.item.minecraft_apple": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/apple" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_barrel": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/barrel" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_bread": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/bread" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_cake": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/cake" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_calcite": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/calcite" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_coal": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/coal" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_crafting_table": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/crafting_table" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_diamond": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/diamond" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_emerald": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/emerald" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_enchanting_table": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/enchanting_table" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_ender_pearl": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/ender_pearl" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_flint_and_steel": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/flint_and_steel" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_gold_ingot": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/gold_ingot" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_iron_ingot": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/iron_ingot" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_lapis_lazuli": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/lapis_lazuli" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_nether_star": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/nether_star" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_nether_wart": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/nether_wart" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_netherite_ingot": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/netherite_ingot" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_redstone": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/redstone" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_shield": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/shield" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_stick": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/stick" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_totem_of_undying": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/totem_of_undying" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_trident": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/trident" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
+  },
+  "entity.macaw.speech.item.minecraft_tuff": {
+    "sounds": [ "macaws:entity/macaw/speech/item/minecraft/tuff" ],
+    "subtitle": "subtitles.entity.macaws:macaw.speech_pickup"
   }
 }

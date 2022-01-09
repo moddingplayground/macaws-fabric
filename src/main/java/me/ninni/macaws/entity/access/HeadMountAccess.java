@@ -4,6 +4,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
 
@@ -20,4 +21,10 @@ public interface HeadMountAccess {
 
     boolean canHeadMount();
     boolean canHeadDismount();
+
+    /**
+     * Runs when the player picks up an item that was not in their inventory before.
+     * Does not run client-side.
+     */
+    void onNovelItemPickUp(ItemStack stack);
 }
