@@ -206,15 +206,23 @@ public class MacawEntityModel<T extends MacawEntity> extends AnimalModel<T> {
 
         if (mounted) {
             this.tail.pitch = -0.225F;
-            this.head.pitch = 0.35F;
+            this.head.pitch = 0.225F;
+            this.tail.pitch += MathHelper.cos(animationProgress * speed * 0.05F) * degree * 0.15F * 0.25F;
+            this.rightWing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 0.05F) * degree * 0.1F * 0.25F + 0.05F;
+            this.leftWing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 0.05F) * degree * -0.1F * 0.25F - 0.05F;
 
             if (pose == MacawEntity.Pose.AIR) {
-                float animProg = animationProgress / 2;
                 float deg = degree / air;
-                this.rightWing.roll = MathHelper.cos(-1.0F + animProg * speed * 1.0F) * deg * 2.0F * 0.25F + 0.25F;
-                this.leftWing.roll = MathHelper.cos(-1.0F + animProg * speed * 1.0F) * deg * -2.0F * 0.25F - 0.25F;
-                this.leftWing.yaw = MathHelper.cos(-1.0F + animProg * speed * 0.5F) * deg * -1.0F * 0.25F;
-                this.rightWing.yaw = MathHelper.cos(-1.0F + animProg * speed * 0.5F) * deg * 1.0F * 0.25F;
+                float width = 0.55F / air;
+                this.leftLeg.pitch = 0.0F;
+                this.rightLeg.pitch = 0.0F;
+                this.body.pivotY = MathHelper.cos(limbAngle * speed * 0.5F) * degree * 1.5F * limbDistance + 18.0F;
+                this.head.pivotY = MathHelper.cos(-1.0F + limbAngle * speed * 0.5F) * degree * 1.5F * limbDistance + 15.0F;
+                this.head.pitch += MathHelper.cos(animationProgress * speed * 0.25F) * degree * 0.2F * 0.25F;
+                this.rightWing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * deg * 2.0F * 0.25F + width;
+                this.leftWing.roll = MathHelper.cos(-1.0F + animationProgress * speed * 1.0F) * deg * -2.0F * 0.25F - width;
+                this.leftWing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * deg * -1.0F * 0.25F;
+                this.rightWing.yaw = MathHelper.cos(-1.0F + animationProgress * speed * 0.5F) * deg * 1.0F * 0.25F;
             }
         }
     }
