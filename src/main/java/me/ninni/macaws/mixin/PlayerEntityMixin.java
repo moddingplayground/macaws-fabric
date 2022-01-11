@@ -59,11 +59,15 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                 NbtCompound nbt = this.getHeadEntity();
                 if (nbt != null && EntityType.get(nbt.getString("id")).filter(type -> type == MacawsEntities.MACAW).isPresent()) {
                     if (!nbt.getBoolean(NBT_SILENT) && this.random.nextInt(1000) < this.mountedMacawAmbientSoundChance++) {
-                        boolean eyepatch = nbt.getBoolean(NBT_HAS_EYEPATCH);
-                        boolean isInWaterBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
-                        SoundEvent sound = eyepatch && isInWaterBoat ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
+                        boolean hasEyepatch = nbt.getBoolean(NBT_HAS_EYEPATCH);
+                        boolean isRowingBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
+                        boolean pirate = hasEyepatch && isRowingBoat;
+
+                        boolean excludeThis = !pirate && this.random.nextInt(3) == 0;
+                        SoundEvent sound = pirate ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
                         Personality personality = Personality.readFromNbt(nbt);
-                        this.world.playSoundFromEntity(this.random.nextInt(3) == 0 ? that : null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
+
+                        this.world.playSoundFromEntity(excludeThis ? that : null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
                         this.resetMountedMacawAmbientSoundChance();
                     }
                 }
