@@ -175,6 +175,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
             // delay
             this.lastMacawSpeechTime = time;
+            this.resetMountedMacawAmbientSoundChance();
         }
     }
 }
