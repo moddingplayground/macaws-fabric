@@ -63,11 +63,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                         boolean isRowingBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
                         boolean pirate = hasEyepatch && isRowingBoat;
 
-                        boolean excludeThis = !pirate && this.random.nextInt(3) == 0;
+                        boolean playToThis = pirate || this.random.nextInt(3) == 0;
                         SoundEvent sound = pirate ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
                         Personality personality = Personality.readFromNbt(nbt);
 
-                        this.world.playSoundFromEntity(excludeThis ? that : null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
+                        this.world.playSoundFromEntity(playToThis ? that : null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
                         this.resetMountedMacawAmbientSoundChance();
                     }
                 }
