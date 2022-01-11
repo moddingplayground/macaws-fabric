@@ -51,6 +51,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
     @Inject(method = "tickMovement", at = @At("TAIL"))
     private void onTickMovement(CallbackInfo ci) {
+        PlayerEntity that = PlayerEntity.class.cast(this);
         if (!this.world.isClient) {
             if (!this.canHeadMount()) {
                 this.tryDropHeadEntity();
@@ -62,8 +63,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                         boolean isInWaterBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;
                         SoundEvent sound = eyepatch && isInWaterBoat ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
                         Personality personality = Personality.readFromNbt(nbt);
-                        this.world.playSoundFromEntity(null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
-
+                        this.world.playSoundFromEntity(this.random.nextInt(3) == 0 ? that : null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
                         this.resetMountedMacawAmbientSoundChance();
                     }
                 }
