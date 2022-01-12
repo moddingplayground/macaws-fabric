@@ -367,10 +367,10 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     }
 
     @Override
-    public void pushAwayFrom(Entity entity) {
-        if (entity instanceof PlayerEntity) return;
-        super.pushAwayFrom(entity);
-    }
+    public void pushAwayFrom(Entity entity) {}
+
+    @Override
+    protected void pushAway(Entity entity) {}
 
     @Override
     public boolean damage(DamageSource source, float amount) {
