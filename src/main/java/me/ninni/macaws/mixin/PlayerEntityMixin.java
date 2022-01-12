@@ -67,7 +67,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                         SoundEvent sound = pirate ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
                         Personality personality = Personality.readFromNbt(nbt);
 
-                        this.world.playSoundFromEntity(playToThis ? that : null, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
+                        this.world.playSoundFromEntity(playToThis ? null : that, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
                         this.resetMountedMacawAmbientSoundChance();
                     }
                 }
