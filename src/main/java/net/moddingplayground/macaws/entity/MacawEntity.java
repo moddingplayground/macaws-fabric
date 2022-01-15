@@ -42,7 +42,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -60,8 +59,6 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
-import net.moddingplayground.macaws.entity.data.MacawsTrackedDataHandlerRegistry;
-import net.moddingplayground.macaws.entity.data.TrackedDataPackager;
 import net.moddingplayground.macaws.mixin.BoatEntityAccessor;
 import net.moddingplayground.macaws.sound.EntitySoundGroup;
 import net.moddingplayground.macaws.sound.MacawsSoundEvents;
@@ -76,10 +73,10 @@ import static net.moddingplayground.macaws.client.util.ClientUtil.*;
 import static net.moddingplayground.macaws.util.MacawsNbtConstants.*;
 
 public class MacawEntity extends TameableHeadEntity implements Flutterer {
-    public static final TrackedData<Variant> VARIANT = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_VARIANT);
-    public static final TrackedData<Personality> PERSONALITY = DataTracker.registerData(MacawEntity.class, MacawsTrackedDataHandlerRegistry.MACAW_PERSONALITY);
-    public static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public static final TrackedData<Integer> VARIANT = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
     public static final TrackedData<Integer> RING_COLOR = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public static final TrackedData<NbtCompound> PERSONALITY = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.TAG_COMPOUND);
 
     public static final ImmutableSet<Item> TAMING_INGREDIENTS = ImmutableSet.of(
         Items.MELON_SLICE,
@@ -143,19 +140,19 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
 
     // getters/setters
     public Variant getVariant() {
-        return this.dataTracker.get(VARIANT);
+        return Variant.safeIndexOf(this.dataTracker.get(VARIANT));
     }
 
     public void setVariant(Variant variant) {
-        this.dataTracker.set(VARIANT, variant);
+        this.dataTracker.set(VARIANT, variant.ordinal());
     }
 
-    public Personality getPersonality() {
-        return this.dataTracker.get(PERSONALITY);
+    public DyeColor getRingColor() {
+        return DyeColor.byId(this.dataTracker.get(RING_COLOR));
     }
 
-    public void setPersonality(Personality personality) {
-        this.dataTracker.set(PERSONALITY, personality);
+    public void setRingColor(DyeColor color){
+        this.dataTracker.set(RING_COLOR, color.getId());
     }
 
     public boolean hasEyepatch() {
@@ -166,12 +163,12 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
         this.dataTracker.set(HAS_EYEPATCH, eyepatch);
     }
 
-    public DyeColor getRingColor() {
-        return DyeColor.byId(this.dataTracker.get(RING_COLOR));
+    public Personality getPersonality() {
+        return Personality.readFromNbt(this.dataTracker.get(PERSONALITY));
     }
 
-    public void setRingColor(DyeColor color){
-        this.dataTracker.set(RING_COLOR, color.getId());
+    public void setPersonality(Personality personality) {
+        this.dataTracker.set(PERSONALITY, personality.writeToNbt());
     }
 
     public Pose getMacawPose() {
@@ -426,8 +423,8 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
-        this.dataTracker.startTracking(VARIANT, Variant.SCARLET);
-        this.dataTracker.startTracking(PERSONALITY, Personality.DEFAULT);
+        this.dataTracker.startTracking(VARIANT, Variant.DEFAULT.ordinal());
+        this.dataTracker.startTracking(PERSONALITY, Personality.DEFAULT.writeToNbt());
         this.dataTracker.startTracking(HAS_EYEPATCH, false);
         this.dataTracker.startTracking(RING_COLOR, DyeColor.RED.getId());
     }
@@ -436,16 +433,16 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         this.getVariant().writeToNbt(nbt);
-        this.getPersonality().writeToNbt(nbt);
-        nbt.putBoolean(NBT_HAS_EYEPATCH, this.hasEyepatch());
         nbt.putByte(NBT_RING_COLOR, (byte) this.getRingColor().getId());
+        nbt.putBoolean(NBT_HAS_EYEPATCH, this.hasEyepatch());
+        nbt.put(NBT_PERSONALITY, this.getPersonality().writeToNbt());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
         this.setVariant(Variant.readFromNbt(nbt));
-        this.setPersonality(Personality.readFromNbt(nbt));
+        this.setPersonality(Personality.readFromNbt(nbt.getCompound(NBT_PERSONALITY)));
         this.setHasEyepatch(nbt.getBoolean(NBT_HAS_EYEPATCH));
         if (nbt.contains(NBT_RING_COLOR, NUMBER_TYPE)) this.setRingColor(DyeColor.byId(nbt.getInt(NBT_RING_COLOR)));
     }
@@ -528,43 +525,29 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
             try { return Variant.valueOf(name); } catch (IllegalArgumentException ignored) {}
             return DEFAULT;
         }
+
+        public static Variant safeIndexOf(Integer i) {
+            try { return VALUES[i]; } catch (ArrayIndexOutOfBoundsException ignored) {}
+            return DEFAULT;
+        }
     }
 
-    public record Personality(float pitch) implements TrackedDataPackager<Personality> {
+    public record Personality(float pitch) {
         public static final Personality DEFAULT = new Personality(1.0f);
 
         public static final float MIN_PITCH = 0.85F;
         public static final float MAX_PITCH = 1.1F;
         public static final int DECIMAL_ACCURACY = 100;
 
-        public void writeToNbt(NbtCompound nbt) {
-            NbtCompound personalityNbt = new NbtCompound();
-            personalityNbt.putFloat(NBT_PERSONALITY_PITCH, this.pitch());
-            nbt.put(NBT_PERSONALITY, personalityNbt);
+        public NbtCompound writeToNbt() {
+            NbtCompound nbt = new NbtCompound();
+            nbt.putFloat(NBT_PERSONALITY_PITCH, this.pitch());
+            return nbt;
         }
 
         public static Personality readFromNbt(NbtCompound nbt) {
-            NbtCompound personalityNbt = nbt.getCompound(NBT_PERSONALITY);
-            if (personalityNbt != null) {
-                float pitch = personalityNbt.getFloat(NBT_PERSONALITY_PITCH);
-                return new Personality(pitch);
-            }
-            return Personality.DEFAULT;
-        }
-
-        @Override
-        public void toPacket(PacketByteBuf buf) {
-            buf.writeFloat(this.pitch());
-        }
-
-        @Override
-        public Personality fromPacket(PacketByteBuf buf) {
-            return new Personality(buf.readFloat());
-        }
-
-        @Override
-        public Personality copyForPackager() {
-            return this;
+            float pitch = nbt.contains(NBT_PERSONALITY_PITCH) ? nbt.getFloat(NBT_PERSONALITY_PITCH) : 1.0f;
+            return new Personality(pitch);
         }
 
         public static Personality random(Random random) {

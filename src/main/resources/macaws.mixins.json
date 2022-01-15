@@ -8,8 +8,7 @@
     "EntityTypeMixin",
     "ItemEntityMixin",
     "PlayerEntityMixin",
-    "ServerPlayerEntityMixin",
-    "TrackedDataHandlerRegistryAccessor"
+    "ServerPlayerEntityMixin"
   ],
   "client": [
     "client.EntityModelLayersInvoker",

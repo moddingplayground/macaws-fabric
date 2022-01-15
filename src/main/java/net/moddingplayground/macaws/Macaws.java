@@ -2,9 +2,7 @@ package net.moddingplayground.macaws;
 
 import com.google.common.reflect.Reflection;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.moddingplayground.macaws.entity.MacawsEntities;
-import net.moddingplayground.macaws.entity.access.HeadMountAccess;
 import net.moddingplayground.macaws.sound.MacawsSoundEvents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +18,7 @@ public class Macaws implements ModInitializer {
         LOGGER.info("Initializing {}", MOD_NAME);
 
         Reflection.initialize(
-            TrackedDataHandlerRegistry.class,
             MacawsSoundEvents.class,
-            HeadMountAccess.class,
             MacawsEntities.class
         );
 

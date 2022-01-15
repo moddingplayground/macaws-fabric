@@ -65,7 +65,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
                         boolean playToThis = pirate || this.random.nextInt(3) == 0;
                         SoundEvent sound = pirate ? ENTITY_MACAW_AMBIENT_EYEPATCH : ENTITY_MACAW_AMBIENT_TAMED;
-                        Personality personality = Personality.readFromNbt(nbt);
+                        Personality personality = Personality.readFromNbt(nbt.getCompound(NBT_PERSONALITY));
 
                         this.world.playSoundFromEntity(playToThis ? null : that, this, sound, SoundCategory.NEUTRAL, 1.0f, personality.pitch());
                         this.resetMountedMacawAmbientSoundChance();
@@ -165,7 +165,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
         if (this.world instanceof ServerWorld serverWorld && this.lastMacawSpeechTime + 13L < time) {
             // get personality from stored macaw
             NbtCompound nbt = this.getHeadEntity();
-            Personality personality = Personality.readFromNbt(nbt);
+            Personality personality = Personality.readFromNbt(nbt.getCompound(NBT_PERSONALITY));
 
             // create packet
             Identifier id = ITEM_TO_SOUND.apply(stack.getItem());
