@@ -31,7 +31,6 @@
   "mixins": [
     "macaws.mixins.json"
   ],
-  "accessWidener": "macaws.accesswidener",
 
   "depends": {
     "java": ">=17",
