@@ -3,48 +3,44 @@
 
   "id": "macaws",
   "version": "${version}",
-  "license": "MIT",
 
   "name": "Macaws",
   "icon": "assets/macaws/icon.png",
-  "description": "",
+  "description": "Chatty companions for your adventures.",
 
+  "license": [
+    "MIT (Code)",
+    "All Rights Reserved (Assets)"
+  ],
   "authors": [
     "Gaetano Russo (Ninni)",
-    "Daniel Orr (andante)"
+    "Daniel Orr (Andante)"
   ],
 
   "contact": {
-    "sources": "https://github.com/N1nn1/macaws",
-    "issues": "https://github.com/N1nn1/macaws/issues"
+    "homepage": "https://moddingplayground.net/macaws",
+    "sources": "https://github.com/moddingplayground/macaws-fabric",
+    "issues": "https://github.com/moddingplayground/macaws-fabric/issues"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "mod.macaws.contact.discord": "https://discord.moddingplayground.net"
+      }
+    }
   },
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "net.moddingplayground.macaws.Macaws"
-    ],
-    "client": [
-      "net.moddingplayground.macaws.client.MacawsClient"
-    ]
+    "main":   [ "net.moddingplayground.macaws.Macaws" ],
+    "client": [ "net.moddingplayground.macaws.client.MacawsClient" ]
   },
-  "mixins": [
-    "macaws.mixins.json"
-  ],
+  "mixins": [ "macaws.mixins.json" ],
 
   "depends": {
     "java": ">=17",
     "minecraft": ">=1.18",
-    "fabricloader": ">=0.12.12",
-    "fabric": "*"
-  },
-
-  "custom": {
-    "modmenu": {
-      "badges": [],
-      "links": {
-        "mod.macaws.contact.discord": "https://discord.gg/fT4MKzUTZS"
-      }
-    }
+    "fabricloader": ">=0.12",
+    "fabric": ">=0.46"
   }
 }
