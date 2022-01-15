@@ -22,10 +22,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.ninni.macaws.Macaws"
+      "net.moddingplayground.macaws.Macaws"
     ],
     "client": [
-      "me.ninni.macaws.client.MacawsClient"
+      "net.moddingplayground.macaws.client.MacawsClient"
     ]
   },
   "mixins": [

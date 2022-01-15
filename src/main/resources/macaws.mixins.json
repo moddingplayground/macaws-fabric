@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_17",
-  "package": "me.ninni.macaws.mixin",
+  "package": "net.moddingplayground.macaws.mixin",
   "mixins": [
     "BoatEntityAccessor",
     "EntityTypeMixin",
