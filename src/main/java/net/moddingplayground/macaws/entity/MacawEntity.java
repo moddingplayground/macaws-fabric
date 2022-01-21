@@ -76,7 +76,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     public static final TrackedData<Integer> VARIANT = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
     public static final TrackedData<Integer> RING_COLOR = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.INTEGER);
     public static final TrackedData<Boolean> HAS_EYEPATCH = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    public static final TrackedData<NbtCompound> PERSONALITY = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.TAG_COMPOUND);
+    public static final TrackedData<NbtCompound> PERSONALITY = DataTracker.registerData(MacawEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
 
     public static final ImmutableSet<Item> TAMING_INGREDIENTS = ImmutableSet.of(
         Items.MELON_SLICE,
