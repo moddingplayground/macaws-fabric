@@ -42,6 +42,7 @@ dependencies {
   modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
   modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+  modImplementation "net.moddingplayground.frame:frame-items-v0:${project.frame_items_version}"
   modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 }
 
@@ -123,8 +124,4 @@ task modrinth(type: com.modrinth.minotaur.TaskModrinthUpload, dependsOn: remapJa
   addLoader('fabric')
 }
 
-task releaseVersion() {
-  github
-  curseforge
-  modrinth
-}
+task releaseVersion(dependsOn: [ 'build', 'github', 'curseforge', 'modrinth' ])

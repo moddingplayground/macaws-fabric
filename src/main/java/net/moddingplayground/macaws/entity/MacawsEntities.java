@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.event.GameEvent;
+import net.moddingplayground.frame.api.items.v0.SortedSpawnEggItem;
 import net.moddingplayground.macaws.Macaws;
 import net.moddingplayground.macaws.entity.access.HeadMountAccess;
 import net.moddingplayground.macaws.sound.MacawsSoundEvents;
@@ -89,7 +90,7 @@ public class MacawsEntities {
     }
 
     private static <T extends Entity> EntityType<T> register(String id, FabricEntityTypeBuilder<T> entityType, Pair<Integer, Integer> colors) {
-        return register(id, entityType, colors, SpawnEggItem::new);
+        return register(id, entityType, colors, SortedSpawnEggItem::new);
     }
 
     private static <T extends Entity> EntityType<T> register(String id, FabricEntityTypeBuilder<T> entityType) {
