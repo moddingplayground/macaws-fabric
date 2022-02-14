@@ -148,10 +148,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
     @Override
     public boolean canHeadMount(@Nullable TameableHeadEntity entity) {
+        PlayerEntity that = (PlayerEntity) (Object) this;
         if (this.isSubmergedInWater() || this.isSubmergedIn(FluidTags.LAVA)) return false;
         if (this.inPowderSnow) return false;
         if (this.isSpectator()) return false;
-        return entity == null || entity.getVelocity().length() > 0.08d;
+        return entity == null || (entity.hasOwnerForceUsed(that) || entity.getVelocity().length() > 0.08d);
     }
 
     @Override
