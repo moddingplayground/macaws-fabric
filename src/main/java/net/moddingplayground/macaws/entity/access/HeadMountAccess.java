@@ -7,6 +7,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
+import net.moddingplayground.macaws.entity.TameableHeadEntity;
+import org.jetbrains.annotations.Nullable;
 
 public interface HeadMountAccess {
     TrackedData<NbtCompound> HEAD_ENTITY = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
@@ -19,7 +21,7 @@ public interface HeadMountAccess {
     boolean tryDropHeadEntity();
     void dropHeadEntity(NbtCompound nbt, Vec3d pos);
 
-    boolean canHeadMount();
+    boolean canHeadMount(@Nullable TameableHeadEntity entity);
     boolean canHeadDismount();
 
     /**

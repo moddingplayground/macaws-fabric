@@ -13,6 +13,7 @@ import net.minecraft.server.PlayerManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.tag.FluidTags;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
@@ -22,7 +23,9 @@ import net.minecraft.world.World;
 import net.moddingplayground.macaws.Macaws;
 import net.moddingplayground.macaws.entity.MacawEntity;
 import net.moddingplayground.macaws.entity.MacawsEntities;
+import net.moddingplayground.macaws.entity.TameableHeadEntity;
 import net.moddingplayground.macaws.entity.access.HeadMountAccess;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -37,7 +40,6 @@ import static net.moddingplayground.macaws.util.MacawsNbtConstants.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements HeadMountAccess {
-    private long headEntityAddedTime;
     private long lastMacawSpeechTime;
     private int mountedMacawAmbientSoundChance;
 
@@ -53,7 +55,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     private void onTickMovement(CallbackInfo ci) {
         PlayerEntity that = PlayerEntity.class.cast(this);
         if (!this.world.isClient) {
-            if (!this.canHeadMount()) {
+            if (!this.canHeadMount(null)) {
                 this.tryDropHeadEntity();
             } else {
                 NbtCompound nbt = this.getHeadEntity();
@@ -103,11 +105,10 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
     @Override
     public boolean addHeadEntity(NbtCompound nbt) {
-        if (!this.canHeadMount()) return false;
+        if (!this.canHeadMount(null)) return false;
 
         if (this.getHeadEntity().isEmpty()) {
             this.setHeadEntity(nbt);
-            this.headEntityAddedTime = this.world.getTime();
             return true;
         }
 
@@ -116,7 +117,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
 
     @Override
     public boolean tryDropHeadEntity(Vec3d pos) {
-        if (this.canHeadDismount()) {
+        if (!this.getHeadEntity().isEmpty() && this.canHeadDismount()) {
             this.dropHeadEntity(this.getHeadEntity(), pos);
             this.setHeadEntity(new NbtCompound());
             this.resetMountedMacawAmbientSoundChance();
@@ -139,19 +140,23 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                     macaw.setPosition(pos);
                     ((ServerWorld)this.world).tryLoadEntity(macaw);
                     macaw.setHealth(nbt.getFloat("Health"));
+                    macaw.setVelocity(Vec3d.ZERO);
                 }
             });
         }
     }
 
     @Override
-    public boolean canHeadMount() {
-        return !this.isSubmergedInWater() && !this.isInLava() && !this.inPowderSnow && !this.isSpectator();
+    public boolean canHeadMount(@Nullable TameableHeadEntity entity) {
+        if (this.isSubmergedInWater() || this.isSubmergedIn(FluidTags.LAVA)) return false;
+        if (this.inPowderSnow) return false;
+        if (this.isSpectator()) return false;
+        return entity == null || entity.getVelocity().length() > 0.08d;
     }
 
     @Override
     public boolean canHeadDismount() {
-        return !this.getHeadEntity().isEmpty() && this.headEntityAddedTime + 20L < this.world.getTime();
+        return true;
     }
 
     private static final Function<Item, Identifier> ITEM_TO_SOUND = Util.memoize(item -> {
@@ -162,7 +167,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
     @Override
     public void onNovelItemPickUp(ItemStack stack) {
         long time = this.world.getTime();
-        if (this.world instanceof ServerWorld serverWorld && this.lastMacawSpeechTime + 13L < time) {
+        if (this.world instanceof ServerWorld world && this.lastMacawSpeechTime + 13L < time) {
             // get personality from stored macaw
             NbtCompound nbt = this.getHeadEntity();
             Personality personality = Personality.readFromNbt(nbt.getCompound(NBT_PERSONALITY));
@@ -172,7 +177,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
             PlaySoundIdS2CPacket packet = new PlaySoundIdS2CPacket(id, SoundCategory.NEUTRAL, this.getPos(), 1.0f, personality.pitch());
 
             // send packet
-            MinecraftServer server = serverWorld.getServer();
+            MinecraftServer server = world.getServer();
             PlayerManager playerManager = server.getPlayerManager();
             RegistryKey<World> worldKey = this.world.getRegistryKey();
             playerManager.sendToAround(null, this.getX(), this.getY(), this.getZ(), 16.0f, worldKey, packet);

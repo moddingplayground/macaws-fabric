@@ -10,8 +10,7 @@ import net.moddingplayground.macaws.entity.access.HeadMountAccess;
 import net.moddingplayground.macaws.sound.MacawsSoundEvents;
 
 public abstract class TameableHeadEntity extends TameableEntity {
-    private static final int READY_TO_SIT_COOLDOWN = 100;
-    private int ticks;
+    private boolean readyToMount = true;
 
     protected TameableHeadEntity(EntityType<? extends TameableEntity> entityType, World world) {
         super(entityType, world);
@@ -32,12 +31,12 @@ public abstract class TameableHeadEntity extends TameableEntity {
 
     @Override
     public void tick() {
-        this.ticks++;
+        if (!this.readyToMount) this.readyToMount = this.isOnGround();
         super.tick();
     }
 
-    public boolean isReadyToSitOnPlayer() {
-        return this.ticks > READY_TO_SIT_COOLDOWN;
+    public boolean isReadyToMount() {
+        return this.readyToMount;
     }
 
     public static class SitOnOwnerHeadGoal extends Goal {
@@ -51,7 +50,7 @@ public abstract class TameableHeadEntity extends TameableEntity {
 
         @Override
         public boolean canStart() {
-            return this.mob.getOwner() instanceof HeadMountAccess access && access.canHeadMount() && !this.mob.isSitting() && this.mob.isReadyToSitOnPlayer();
+            return this.mob.getOwner() instanceof HeadMountAccess access && access.canHeadMount(this.mob) && !this.mob.isSitting() && this.mob.isReadyToMount();
         }
 
         @Override
