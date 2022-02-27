@@ -6,6 +6,14 @@
   "mod.macaws.resource_pack.parakeets": "Parakeets",
   "mod.macaws.resource_pack.parakeets.description": "Retextured parrots to differ from the Macaw's textures",
 
+  "config.macaws.title": "Macaws",
+  "config.macaws.save_toast_line0": "Restart the game to update",
+  "config.macaws.save_toast_line1": "the Macaws spawn rates",
+  "config.macaws.category.spawning": "",
+  "config.macaws.entity_macaw_spawn_weight": "Spawn Weight",
+  "config.macaws.entity_macaw_spawn_min_group_size": "Minimum Group Spawn Size",
+  "config.macaws.entity_macaw_spawn_max_group_size": "Maximum Group Spawn Size",
+
   "entity.macaws.macaw": "Macaw",
   "item.macaws.macaw_spawn_egg": "Macaw Spawn Egg",
 

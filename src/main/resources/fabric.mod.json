@@ -3,45 +3,46 @@
 
   "id": "macaws",
   "version": "${version}",
-
-  "name": "Macaws",
-  "icon": "assets/macaws/icon.png",
-  "description": "Chatty companions for your adventures.",
-
   "license": [
     "MIT (Code)",
     "All Rights Reserved (Assets)"
   ],
+
+  "name": "Macaws",
+  "icon": "assets/macaws/icon.png",
+  "description": "Chatty companions for your adventures",
+
   "authors": [
     "Gaetano Russo (Ninni)",
     "Daniel Orr (Andante)"
   ],
-
   "contact": {
     "homepage": "https://moddingplayground.net/macaws",
     "sources": "https://github.com/moddingplayground/macaws-fabric",
     "issues": "https://github.com/moddingplayground/macaws-fabric/issues"
   },
   "custom": {
-    "modmenu": {
-      "links": {
-        "mod.macaws.contact.discord": "https://discord.moddingplayground.net"
-      }
-    }
+    "modmenu": { "links": { "mod.macaws.contact.discord": "https://discord.moddingplayground.net" } }
   },
 
   "environment": "*",
   "entrypoints": {
-    "main":   [ "net.moddingplayground.macaws.Macaws" ],
-    "client": [ "net.moddingplayground.macaws.client.MacawsClient" ]
+    "main":   [
+      "net.moddingplayground.macaws.impl.MacawsImpl",
+      "net.moddingplayground.macaws.impl.entity.MacawsEntityTypeImpl"
+    ],
+    "toymaker": [ "net.moddingplayground.macaws.impl.data.MacawsToymakerImpl" ],
+
+    "client": [ "net.moddingplayground.macaws.impl.client.MacawsClientImpl" ],
+    "modmenu": [ "net.moddingplayground.macaws.impl.client.MacawsModMenuImpl" ]
   },
   "mixins": [ "macaws.mixins.json" ],
 
   "depends": {
     "java": ">=17",
     "minecraft": ">=1.18",
-    "fabricloader": ">=0.13",
+    "fabricloader": ">=0.12",
     "fabric": ">=0.46",
-    "frame": ">=0.8"
+    "frame": ">=0.12.1"
   }
 }

@@ -20,11 +20,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.moddingplayground.macaws.Macaws;
-import net.moddingplayground.macaws.entity.MacawEntity;
-import net.moddingplayground.macaws.entity.MacawsEntities;
-import net.moddingplayground.macaws.entity.TameableHeadEntity;
-import net.moddingplayground.macaws.entity.access.HeadMountAccess;
+import net.moddingplayground.macaws.api.Macaws;
+import net.moddingplayground.macaws.api.entity.MacawEntity;
+import net.moddingplayground.macaws.api.entity.MacawsEntityType;
+import net.moddingplayground.macaws.api.entity.TameableHeadEntity;
+import net.moddingplayground.macaws.impl.entity.HeadMountAccess;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,9 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.function.Function;
 
 import static net.minecraft.nbt.NbtElement.*;
-import static net.moddingplayground.macaws.entity.MacawEntity.*;
-import static net.moddingplayground.macaws.sound.MacawsSoundEvents.*;
-import static net.moddingplayground.macaws.util.MacawsNbtConstants.*;
+import static net.moddingplayground.macaws.api.entity.MacawEntity.*;
+import static net.moddingplayground.macaws.api.sound.MacawsSoundEvents.*;
+import static net.moddingplayground.macaws.api.util.MacawsNbtConstants.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements HeadMountAccess {
@@ -59,7 +59,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
                 this.tryDropHeadEntity();
             } else {
                 NbtCompound nbt = this.getHeadEntity();
-                if (nbt != null && EntityType.get(nbt.getString("id")).filter(type -> type == MacawsEntities.MACAW).isPresent()) {
+                if (nbt != null && EntityType.get(nbt.getString("id")).filter(type -> type == MacawsEntityType.MACAW).isPresent()) {
                     if (!nbt.getBoolean(NBT_SILENT) && this.random.nextInt(1000) < this.mountedMacawAmbientSoundChance++) {
                         boolean hasEyepatch = nbt.getBoolean(NBT_HAS_EYEPATCH);
                         boolean isRowingBoat = this.getRootVehicle() instanceof BoatEntityAccessor boat && boat.getLocation() == BoatEntity.Location.IN_WATER;

@@ -5,14 +5,11 @@
   "package": "net.moddingplayground.macaws.mixin",
   "mixins": [
     "BoatEntityAccessor",
-    "EntityTypeMixin",
     "ItemEntityMixin",
     "PlayerEntityMixin",
     "ServerPlayerEntityMixin"
   ],
   "client": [
-    "client.EntityModelLayersInvoker",
-    "client.EntityModelLayersMixin",
     "client.PlayerEntityRendererMixin",
     "client.SoundSystemMixin"
   ],
