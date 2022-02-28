@@ -20,8 +20,7 @@ import net.moddingplayground.macaws.api.Macaws;
 import java.util.Optional;
 
 public interface MacawsEntityType extends Macaws, ModInitializer {
-    EntityType<MacawEntity> MACAW = register(
-        "macaw",
+    EntityType<MacawEntity> MACAW = register("macaw",
         FabricEntityTypeBuilder.createMob()
                                .entityFactory(MacawEntity::new).spawnGroup(SpawnGroup.CREATURE)
                                .dimensions(EntityDimensions.fixed(0.5F, 0.9F))
