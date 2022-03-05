@@ -16,8 +16,8 @@ import net.moddingplayground.macaws.impl.entity.HeadMountAccess;
 public abstract class TameableHeadEntity extends TameableEntity {
     private long lastUseTime = 0;
 
-    protected TameableHeadEntity(EntityType<? extends TameableEntity> entityType, World world) {
-        super(entityType, world);
+    protected TameableHeadEntity(EntityType<? extends TameableEntity> type, World world) {
+        super(type, world);
     }
 
     public long getLastUseTime() {

@@ -11,7 +11,6 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Flutterer;
-import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.FuzzyTargeting;
 import net.minecraft.entity.ai.control.FlightMoveControl;
@@ -98,8 +97,8 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     private float flapSpeed = 1.0f;
     private float minFlapSpeed = 1.0f;
 
-    public MacawEntity(EntityType<? extends TameableEntity> entityType, World world) {
-        super(entityType, world);
+    public MacawEntity(EntityType<? extends TameableEntity> type, World world) {
+        super(type, world);
         this.moveControl = new FlightMoveControl(this, 10, false);
         this.setPathfindingPenalty(PathNodeType.DANGER_FIRE, -1.0F);
         this.setPathfindingPenalty(PathNodeType.DAMAGE_FIRE, -1.0F);
@@ -214,14 +213,13 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
             if (this.hasEyepatch()) {
                 if (stack.getItem() instanceof ShearsItem) {
                     if (!player.getAbilities().creativeMode) {
-                        ItemEntity itemEntity = this.dropItem(EYEPATCH_GIVE_ITEM, 1);
-                        if (itemEntity != null) {
-                            itemEntity.addVelocity(
+                        Optional.ofNullable(this.dropItem(EYEPATCH_GIVE_ITEM, 1)).ifPresent(entity -> {
+                            entity.addVelocity(
                                 (this.random.nextFloat() - this.random.nextFloat()) * 0.1f,
                                 this.random.nextFloat() * 0.05f,
                                 (this.random.nextFloat() - this.random.nextFloat()) * 0.1f
                             );
-                        }
+                        });
                     }
 
                     this.world.playSoundFromEntity(null, this, MacawsSoundEvents.ENTITY_MACAW_SHEAR, SoundCategory.PLAYERS, 1.0f, 1.0f);
@@ -293,9 +291,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
                 if (this.random.nextInt(5) == 0) {
                     this.setOwner(player);
                     this.world.sendEntityStatus(this, EntityStatuses.ADD_POSITIVE_PLAYER_REACTION_PARTICLES);
-                } else {
-                    this.world.sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
-                }
+                } else this.world.sendEntityStatus(this, EntityStatuses.ADD_NEGATIVE_PLAYER_REACTION_PARTICLES);
             }
 
             return ActionResult.success(this.world.isClient);
