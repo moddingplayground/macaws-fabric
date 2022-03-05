@@ -146,6 +146,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
         }
     }
 
+    /**
+     * @param entity nullable for if an entity object is not available or to bypass checks
+     */
     @Override
     public boolean canHeadMount(@Nullable TameableHeadEntity entity) {
         PlayerEntity that = (PlayerEntity) (Object) this;

@@ -33,7 +33,8 @@ public abstract class TameableHeadEntity extends TameableEntity {
     }
 
     public boolean canOwnerForceUse(PlayerEntity owner) {
-        return this.distanceTo(owner) < 5.0d;
+        HeadMountAccess access = (HeadMountAccess) owner;
+        return access.getHeadEntity().isEmpty() && !this.isSitting() && access.canHeadMount(null) && this.distanceTo(owner) < 5.0d;
     }
 
     public boolean isCollidingWith(Entity other) {
