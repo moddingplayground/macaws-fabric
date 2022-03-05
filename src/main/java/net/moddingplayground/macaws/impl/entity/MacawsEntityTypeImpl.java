@@ -8,7 +8,7 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.tag.Tag;
+import net.minecraft.tag.TagKey;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -54,7 +54,7 @@ public final class MacawsEntityTypeImpl implements MacawsEntityType {
         addSpawn(MacawsBiomeTags.SPAWNS_MACAW, MACAW, config.weight, config.minGroupSize, config.maxGroupSize);
     }
 
-    public void addSpawn(Tag<Biome> tag, EntityType<?> entity, IntOption weight, IntOption minSize, IntOption maxSize) {
+    public void addSpawn(TagKey<Biome> tag, EntityType<?> entity, IntOption weight, IntOption minSize, IntOption maxSize) {
         BiomeModifications.addSpawn(BiomeSelectors.tag(tag), entity.getSpawnGroup(), entity, weight.getValue(), minSize.getValue(), maxSize.getValue());
     }
 

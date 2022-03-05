@@ -2,7 +2,6 @@ package net.moddingplayground.macaws.api.entity;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.Entity;
@@ -40,6 +39,7 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.ShearsItem;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -212,7 +212,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
 
         if (!this.world.isClient) {
             if (this.hasEyepatch()) {
-                if (FabricToolTags.SHEARS.contains(stack.getItem())) {
+                if (stack.getItem() instanceof ShearsItem) {
                     if (!player.getAbilities().creativeMode) {
                         ItemEntity itemEntity = this.dropItem(EYEPATCH_GIVE_ITEM, 1);
                         if (itemEntity != null) {
