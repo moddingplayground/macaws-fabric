@@ -1,6 +1,5 @@
 package net.moddingplayground.macaws.api.entity;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.entity.Entity;
@@ -19,7 +18,7 @@ import net.moddingplayground.macaws.api.Macaws;
 
 import java.util.Optional;
 
-public interface MacawsEntityType extends Macaws, ModInitializer {
+public interface MacawsEntityType extends Macaws {
     EntityType<MacawEntity> MACAW = register("macaw",
         FabricEntityTypeBuilder.createMob()
                                .entityFactory(MacawEntity::new).spawnGroup(SpawnGroup.CREATURE)

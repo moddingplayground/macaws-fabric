@@ -31,7 +31,10 @@
       "net.moddingplayground.macaws.impl.MacawsImpl",
       "net.moddingplayground.macaws.impl.entity.MacawsEntityTypeImpl"
     ],
-    "client": [ "net.moddingplayground.macaws.impl.client.MacawsClientImpl" ],
+    "client": [
+      "net.moddingplayground.macaws.impl.client.MacawsClientImpl",
+      "net.moddingplayground.macaws.impl.client.entity.MacawsEntityTypeClientImpl"
+    ],
 
     "modmenu":  [ "net.moddingplayground.macaws.impl.client.MacawsModMenuImpl" ],
     "toymaker": [ "net.moddingplayground.macaws.impl.data.MacawsToymakerImpl" ]

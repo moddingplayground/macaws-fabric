@@ -1,29 +1,26 @@
 package net.moddingplayground.macaws.mixin;
 
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.s2c.play.PlaySoundIdS2CPacket;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.PlayerManager;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.tag.FluidTags;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
-import net.moddingplayground.macaws.api.Macaws;
 import net.moddingplayground.macaws.api.entity.MacawEntity;
 import net.moddingplayground.macaws.api.entity.MacawsEntityType;
 import net.moddingplayground.macaws.api.entity.TameableHeadEntity;
+import net.moddingplayground.macaws.api.client.entity.MacawSpeechCallback;
 import net.moddingplayground.macaws.impl.entity.HeadMountAccess;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,7 +28,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static net.minecraft.nbt.NbtElement.*;
 import static net.moddingplayground.macaws.api.entity.MacawEntity.*;
@@ -40,7 +39,6 @@ import static net.moddingplayground.macaws.api.util.MacawsNbtConstants.*;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements HeadMountAccess {
-    private long lastMacawSpeechTime;
     private int mountedMacawAmbientSoundChance;
 
     private PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
@@ -163,31 +161,25 @@ public abstract class PlayerEntityMixin extends LivingEntity implements HeadMoun
         return true;
     }
 
-    private static final Function<Item, Identifier> ITEM_TO_SOUND = Util.memoize(item -> {
-        Identifier id = Registry.ITEM.getId(item);
-        return new Identifier(Macaws.MOD_ID, "entity.macaw.speech.item.%s".formatted(id.toUnderscoreSeparatedString()));
-    });
-
     @Override
     public void onNovelItemPickUp(ItemStack stack) {
-        long time = this.world.getTime();
-        if (this.world instanceof ServerWorld world && this.lastMacawSpeechTime + 13L < time) {
-            // get personality from stored macaw
+        PlayerEntity that = (PlayerEntity) (Object) this;
+        if (that instanceof ServerPlayerEntity splayer) {
+            UUID uuid = this.getUuid();
             NbtCompound nbt = this.getHeadEntity();
-            Personality personality = Personality.readFromNbt(nbt.getCompound(NBT_PERSONALITY));
+            NbtCompound personality = nbt.getCompound(NBT_PERSONALITY);
 
-            // create packet
-            Identifier id = ITEM_TO_SOUND.apply(stack.getItem());
-            PlaySoundIdS2CPacket packet = new PlaySoundIdS2CPacket(id, SoundCategory.NEUTRAL, this.getPos(), 1.0f, personality.pitch());
+            List<ServerPlayerEntity> players = new ArrayList<>(PlayerLookup.tracking(that));
+            players.add(splayer);
+            for (ServerPlayerEntity player : players) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeUuid(uuid);
+                buf.writeNbt(personality);
+                buf.writeItemStack(stack);
 
-            // send packet
-            MinecraftServer server = world.getServer();
-            PlayerManager playerManager = server.getPlayerManager();
-            RegistryKey<World> worldKey = this.world.getRegistryKey();
-            playerManager.sendToAround(null, this.getX(), this.getY(), this.getZ(), 16.0f, worldKey, packet);
+                ServerPlayNetworking.send(player, MacawSpeechCallback.PACKET_ID, buf);
+            }
 
-            // delay
-            this.lastMacawSpeechTime = time;
             this.resetMountedMacawAmbientSoundChance();
         }
     }

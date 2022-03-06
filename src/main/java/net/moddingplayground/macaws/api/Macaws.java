@@ -8,6 +8,6 @@ import org.slf4j.LoggerFactory;
  */
 public interface Macaws {
     String MOD_ID   = "macaws";
-    String MOD_NAME = "macaws";
+    String MOD_NAME = "Macaws";
     Logger LOGGER   = LoggerFactory.getLogger(MOD_ID);
 }

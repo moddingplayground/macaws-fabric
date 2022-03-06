@@ -10,8 +10,7 @@
     "ServerPlayerEntityMixin"
   ],
   "client": [
-    "client.PlayerEntityRendererMixin",
-    "client.SoundSystemMixin"
+    "client.PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

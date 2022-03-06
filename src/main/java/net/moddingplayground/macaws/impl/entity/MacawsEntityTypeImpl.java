@@ -1,5 +1,6 @@
 package net.moddingplayground.macaws.impl.entity;
 
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
@@ -23,7 +24,7 @@ import net.moddingplayground.macaws.impl.config.MacawsConfig;
 
 import static net.moddingplayground.macaws.api.util.MacawsNbtConstants.*;
 
-public final class MacawsEntityTypeImpl implements MacawsEntityType {
+public final class MacawsEntityTypeImpl implements MacawsEntityType, ModInitializer {
     @Override
     public void onInitialize() {
         UseBlockCallback.EVENT.register((player, world, hand, hit) -> {
