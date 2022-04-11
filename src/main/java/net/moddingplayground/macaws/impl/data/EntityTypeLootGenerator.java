@@ -7,11 +7,12 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.LootingEnchantLootFunction;
 import net.minecraft.util.Identifier;
 import net.moddingplayground.frame.api.toymaker.v0.generator.loot.AbstractEntityTypeLootTableGenerator;
+import net.moddingplayground.macaws.api.Macaws;
 import net.moddingplayground.macaws.api.entity.MacawsEntityType;
 
 public class EntityTypeLootGenerator extends AbstractEntityTypeLootTableGenerator {
-    public EntityTypeLootGenerator(String modId) {
-        super(modId);
+    public EntityTypeLootGenerator() {
+        super(Macaws.MOD_ID);
     }
 
     @Override

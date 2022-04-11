@@ -10,8 +10,8 @@ import net.moddingplayground.macaws.api.Macaws;
 public class MacawsToymakerImpl implements Macaws, ToymakerEntrypoint {
     @Override
     public void onInitializeToymaker() {
-        TagGeneratorStore.register(() -> new BiomeTagGenerator(MOD_ID));
-        ItemModelGeneratorStore.register(() -> new ItemModelGenerator(MOD_ID));
-        LootGeneratorStore.register(() -> new EntityTypeLootGenerator(MOD_ID), LootContextTypes.ENTITY);
+        TagGeneratorStore.register(BiomeTagGenerator::new);
+        ItemModelGeneratorStore.register(ItemModelGenerator::new);
+        LootGeneratorStore.register(EntityTypeLootGenerator::new, LootContextTypes.ENTITY);
     }
 }
