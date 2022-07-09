@@ -41,7 +41,7 @@ public class MacawSpeechManager implements Macaws, MacawSpeechCallback {
         Item item = stack.getItem();
         Optional.ofNullable(this.cache.computeIfAbsent(item, this::createSound)).ifPresent(sound -> {
             if (sound == EMPTY) return;
-            this.lastInstance = new MacawSpeechSoundInstance(sound, personality.pitch(), source);
+            this.lastInstance = new MacawSpeechSoundInstance(sound, personality.pitch(), source, player.getRandom().nextLong());
             soundManager.play(this.lastInstance);
         });
     }

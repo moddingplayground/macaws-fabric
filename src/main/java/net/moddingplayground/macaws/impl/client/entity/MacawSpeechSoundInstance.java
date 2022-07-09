@@ -11,8 +11,8 @@ import net.minecraft.sound.SoundEvent;
 public class MacawSpeechSoundInstance extends EntityTrackingSoundInstance {
     private int tick;
 
-    public MacawSpeechSoundInstance(SoundEvent sound, float pitch, Entity entity) {
-        super(sound, SoundCategory.NEUTRAL, 1.0F, pitch, entity);
+    public MacawSpeechSoundInstance(SoundEvent sound, float pitch, Entity entity, long seed) {
+        super(sound, SoundCategory.NEUTRAL, 1.0F, pitch, entity, seed);
     }
 
     @Override

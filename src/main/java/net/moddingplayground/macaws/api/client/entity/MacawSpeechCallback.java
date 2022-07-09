@@ -13,15 +13,16 @@ import net.moddingplayground.macaws.api.entity.MacawEntity;
 /**
  * Called when the client receives a Macaw speech packet.
  */
-@Environment(EnvType.CLIENT)
 @FunctionalInterface
 public interface MacawSpeechCallback {
+    Identifier PACKET_ID = new Identifier(Macaws.MOD_ID, "macaw_speech");
+
+    @Environment(EnvType.CLIENT)
     Event<MacawSpeechCallback> EVENT = EventFactory.createArrayBacked(
         MacawSpeechCallback.class,
         callbacks -> (player, source, personality, stack) -> { for (MacawSpeechCallback callback : callbacks) callback.onSpeech(player, source, personality, stack); }
     );
 
-    Identifier PACKET_ID = new Identifier(Macaws.MOD_ID, "macaw_speech");
-
+    @Environment(EnvType.CLIENT)
     void onSpeech(PlayerEntity player, PlayerEntity source, MacawEntity.Personality personality, ItemStack stack);
 }

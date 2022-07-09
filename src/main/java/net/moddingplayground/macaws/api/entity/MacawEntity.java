@@ -52,6 +52,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
@@ -63,7 +64,6 @@ import net.moddingplayground.macaws.mixin.BoatEntityAccessor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Supplier;
 
 import static net.minecraft.nbt.NbtElement.*;
@@ -232,7 +232,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
                 if (stack.isOf(EYEPATCH_GIVE_ITEM)) {
                     this.setHasEyepatch(true);
                     this.world.playSoundFromEntity(null, this, MacawsSoundEvents.ENTITY_MACAW_EQUIP_EYEPATCH, SoundCategory.PLAYERS, 1.0f, 1.0f);
-                    this.emitGameEvent(GameEvent.MOB_INTERACT, player);
+                    this.emitGameEvent(GameEvent.ENTITY_INTERACT, player);
                     stack.decrement(1);
                     return ActionResult.SUCCESS;
                 }
@@ -332,7 +332,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
 
     @Override
     public float getSoundPitch() {
-        return this.getPersonality().pitch() + (this.random.nextFloat(PITCH_DEVIANCE * 2) - PITCH_DEVIANCE);
+        return this.getPersonality().pitch() + ((this.random.nextFloat() * (PITCH_DEVIANCE * 2)) - PITCH_DEVIANCE);
     }
 
     @Override
@@ -487,7 +487,10 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
     }
 
     public enum Variant {
-        BLUE_AND_GOLD, SCARLET, HYACINTH, GREEN;
+        BLUE_AND_GOLD,
+        SCARLET,
+        HYACINTH,
+        GREEN;
 
         private static final Variant[] VALUES = Variant.values();
         public static final Variant DEFAULT = VALUES[0];
@@ -555,7 +558,7 @@ public class MacawEntity extends TameableHeadEntity implements Flutterer {
         }
 
         public static Personality random(Random random) {
-            float pitch = (random.nextFloat(MAX_PITCH - MIN_PITCH) + MIN_PITCH);
+            float pitch = ((random.nextFloat() * (MAX_PITCH - MIN_PITCH)) + MIN_PITCH);
             float pitchRnd = ((float) (int) (pitch * DECIMAL_ACCURACY)) / DECIMAL_ACCURACY;
             return new Personality(pitchRnd);
         }

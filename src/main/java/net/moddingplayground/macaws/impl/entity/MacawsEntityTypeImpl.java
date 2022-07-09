@@ -20,7 +20,7 @@ import net.moddingplayground.macaws.api.entity.MacawEntity;
 import net.moddingplayground.macaws.api.entity.MacawsEntityType;
 import net.moddingplayground.macaws.api.sound.MacawsSoundEvents;
 import net.moddingplayground.macaws.api.tag.MacawsBiomeTags;
-import net.moddingplayground.macaws.impl.config.MacawsConfig;
+import net.moddingplayground.macaws.impl.config.MacawsSpawningConfig;
 
 import static net.moddingplayground.macaws.api.util.MacawsNbtConstants.*;
 
@@ -39,7 +39,7 @@ public final class MacawsEntityTypeImpl implements MacawsEntityType, ModInitiali
                         BlockPos bpos = new BlockPos(pos);
                         if (world.getBlockState(bpos).getCollisionShape(world, bpos).isEmpty()) {
                             if (access.tryDropHeadEntity(pos)) {
-                                world.emitGameEvent(GameEvent.ENTITY_PLACE, player);
+                                dummy.emitGameEvent(GameEvent.ENTITY_PLACE, player);
                                 player.world.playSound(null, player.getX(), player.getY(), player.getZ(), MacawsSoundEvents.ENTITY_MACAW_MOUNT_OFF, player.getSoundCategory(), 0.3f, 0.3f + (player.getRandom().nextFloat() * 0.2f));
                                 return ActionResult.SUCCESS;
                             }
@@ -51,7 +51,7 @@ public final class MacawsEntityTypeImpl implements MacawsEntityType, ModInitiali
             return ActionResult.PASS;
         });
 
-        MacawsConfig config = MacawsConfig.INSTANCE;
+        MacawsSpawningConfig config = MacawsSpawningConfig.INSTANCE;
         addSpawn(MacawsBiomeTags.SPAWNS_MACAW, MACAW, config.weight, config.minGroupSize, config.maxGroupSize);
     }
 

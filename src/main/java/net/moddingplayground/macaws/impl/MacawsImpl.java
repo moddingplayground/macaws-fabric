@@ -6,7 +6,7 @@ import net.moddingplayground.frame.api.util.InitializationLogger;
 import net.moddingplayground.macaws.api.Macaws;
 import net.moddingplayground.macaws.api.entity.MacawsEntityType;
 import net.moddingplayground.macaws.api.sound.MacawsSoundEvents;
-import net.moddingplayground.macaws.impl.config.MacawsConfig;
+import net.moddingplayground.macaws.impl.config.MacawsSpawningConfig;
 
 public class MacawsImpl implements Macaws, ModInitializer {
     private static MacawsImpl instance;
@@ -21,7 +21,7 @@ public class MacawsImpl implements Macaws, ModInitializer {
     @Override
     public void onInitialize() {
         this.initializer.start();
-        Reflection.initialize(MacawsConfig.class, MacawsSoundEvents.class, MacawsEntityType.class);
+        Reflection.initialize(MacawsSpawningConfig.class, MacawsSoundEvents.class, MacawsEntityType.class);
         this.initializer.finish();
     }
 

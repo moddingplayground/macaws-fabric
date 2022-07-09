@@ -37,15 +37,15 @@
     ],
 
     "modmenu":  [ "net.moddingplayground.macaws.impl.client.MacawsModMenuImpl" ],
-    "toymaker": [ "net.moddingplayground.macaws.impl.data.MacawsToymakerImpl" ]
+    "fabric-datagen": [ "net.moddingplayground.macaws.impl.data.MacawsDataGeneratorImpl" ]
   },
   "mixins": [ "macaws.mixins.json" ],
 
   "depends": {
     "java": ">=17",
-    "minecraft": ">=1.18.2",
-    "fabricloader": ">=0.13",
-    "fabric": ">=0.47",
-    "frame": ">=0.14"
+    "minecraft": ">=1.19",
+    "fabricloader": ">=0.14",
+    "fabric": ">=0.57",
+    "frame": ">=0.22"
   }
 }

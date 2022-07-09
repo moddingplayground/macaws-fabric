@@ -5,10 +5,10 @@ plugins {
   id 'idea'
   id 'eclipse'
 
-  id 'fabric-loom' version '0.11-SNAPSHOT'
+  id 'fabric-loom' version '0.12-SNAPSHOT'
   id 'maven-publish'
 
-  id 'com.modrinth.minotaur' version '2.0.2'
+  id 'com.modrinth.minotaur' version '2.+'
   id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
@@ -56,26 +56,31 @@ dependencies {
   modImplementation "com.terraformersmc:modmenu:${project.ver_mod_menu}"
 }
 
-/* Data Generation */
-
-def dataOutput = 'src/generated/resources'
+/* Loom */
 
 loom {
   runtimeOnlyLog4j = true
+}
 
+/* Data Generation */
+
+def dataOutput = 'src/main/generated'
+
+loom {
   runs {
-    data {
+    datagen {
       server()
-      vmArgs(
-              "-Dtoymaker.datagen=true",
-              "-Dtoymaker.datagen.modid=${project.mod_id}",
-              "-Dtoymaker.datagen.path=\"${project.file(dataOutput)};${project.file("$buildDir/resources/main")}\""
-      )
+
+      name "Data Generation"
+      vmArg "-Dfabric-api.datagen"
+      vmArg "-Dfabric-api.datagen.output-dir=${file(dataOutput)}"
+
+      runDir "build/datagen"
     }
   }
 }
 
-sourceSets.main.resources { srcDirs += dataOutput }
+sourceSets { main { resources { srcDirs += dataOutput } } }
 
 /* Resource Processing */
 
@@ -97,7 +102,7 @@ processResources {
       file.text = JsonOutput.toJson(new JsonSlurper().parse(file))
       bytes += oldLength - file.length()
     }
-    println('Minified ' + minif + ' json files. Saved ' + bytes + ' bytes. Took ' + (System.currentTimeMillis() - start) + 'ms.')
+    println("Minified $minif json files. Saved $bytes bytes. Took ${System.currentTimeMillis() - start} ms.")
   }
 }
 
@@ -106,7 +111,18 @@ jar { from('README.md', 'LICENSE', 'LICENSE_ASSETS') exclude('.cache') }
 
 /* Publishing */
 
-publishing { publications { mavenJava(MavenPublication) { from components.java } } }
+java { withSourcesJar() }
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact(remapJar) { builtBy remapJar }
+      artifact(sourcesJar) { builtBy remapSourcesJar }
+    }
+  }
+}
+
+loom { disableDeprecatedPomGeneration(publishing.publications.mavenJava) }
 
 /* Releasing */
 
@@ -124,7 +140,7 @@ task github(dependsOn: build) {
     builder.name(VER_NAME)
     builder.body(CHANGELOG)
     builder.commitish(project.github_branch)
-    builder.prerelease(project.release_type == 'beta')
+    builder.prerelease(project.release_type != 'release')
     builder.create().uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"), "application/java-archive");
   }
 }
@@ -140,8 +156,8 @@ if (ENV.MODRINTH_TOKEN) modrinth {
   uploadFile = remapJar
   gameVersions = [ project.ver_minecraft ]
   dependencies = [
-          new ModDependency("P7dR8mSH", DependencyType.REQUIRED),
-          new ModDependency("dY183GiL", DependencyType.REQUIRED)
+          new ModDependency("fabric-api", DependencyType.REQUIRED),
+          new ModDependency("frame-api", DependencyType.REQUIRED)
   ]
 }
 
@@ -159,8 +175,8 @@ if (ENV.CURSEFORGE_API_KEY) curseforge {
     mainArtifact(remapJar) {
       displayName = VER_NAME
       relations {
-        requiredLibrary 'fabric-api'
-        requiredLibrary 'frame-api'
+        requiredDependency 'fabric-api'
+        requiredDependency 'frame-api'
       }
     }
 

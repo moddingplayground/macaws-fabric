@@ -9,10 +9,10 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.toast.SystemToast;
 import net.minecraft.client.toast.ToastManager;
 import net.minecraft.text.Style;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.moddingplayground.macaws.api.Macaws;
-import net.moddingplayground.macaws.impl.config.MacawsConfig;
+import net.moddingplayground.macaws.impl.config.MacawsSpawningConfig;
 
 @Environment(EnvType.CLIENT)
 public class MacawsConfigScreenFactory {
@@ -32,24 +32,24 @@ public class MacawsConfigScreenFactory {
         builder.setGlobalizedExpanded(false);
 
         ConfigEntryBuilder entries = builder.entryBuilder();
-        MacawsConfig.INSTANCE.addConfigListEntries(entries, () -> builder.getOrCreateCategory(text("category.spawning")));
+        MacawsSpawningConfig.INSTANCE.addConfigListEntries(entries, () -> builder.getOrCreateCategory(text("category.spawning")));
 
         return builder.build();
     }
 
     public void save() {
-        MacawsConfig.INSTANCE.save();
+        MacawsSpawningConfig.INSTANCE.save();
 
         MinecraftClient client = MinecraftClient.getInstance();
         ToastManager toasts = client.getToastManager();
         SystemToast.add(
             toasts, SystemToast.Type.TUTORIAL_HINT,
-            new TranslatableText("config.macaws.save_toast_line0"),
-            new TranslatableText("config.macaws.save_toast_line1").setStyle(Style.EMPTY.withColor(0xFCFC00))
+            Text.translatable("config.macaws.save_toast_line0"),
+            Text.translatable("config.macaws.save_toast_line1").setStyle(Style.EMPTY.withColor(0xFCFC00))
         );
     }
 
-    public TranslatableText text(String label) {
-        return new TranslatableText("config.%s.%s".formatted(Macaws.MOD_ID, label));
+    public Text text(String label) {
+        return Text.translatable("config.%s.%s".formatted(Macaws.MOD_ID, label));
     }
 }
